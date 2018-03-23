@@ -185,6 +185,9 @@ class Application
     // Call syncOwnMetrics on self and syncMetrics all objects owned by App.
     virtual void syncAllMetrics() = 0;
 
+    // Clear all metrics
+    virtual void clearMetrics(std::string const& domain) = 0;
+
     // Get references to each of the "subsystem" objects.
     virtual TmpDirManager& getTmpDirManager() = 0;
     virtual LedgerManager& getLedgerManager() = 0;
