@@ -12,12 +12,10 @@
 #include "main/Whitelist.h"
 #include "transactions/SignatureUtils.h"
 #include "util/Algoritm.h"
+#include "util/XDROperators.h"
 
 namespace stellar
 {
-
-using xdr::operator<;
-using xdr::operator==;
 
 SignatureChecker::SignatureChecker(
     uint32_t protocolVersion, Hash const& contentsHash,
