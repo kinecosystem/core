@@ -271,6 +271,12 @@ ApplicationImpl::getJsonInfo()
         info["invariant_failures"] = invariantFailures;
     }
 
+    auto historyArchiveInfo = getHistoryArchiveManager().getJsonInfo();
+    if (!historyArchiveInfo.empty())
+    {
+        info["history"] = historyArchiveInfo;
+    }
+
     return root;
 }
 
