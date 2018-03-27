@@ -16,6 +16,7 @@
 #include "database/Database.h"
 #include "herder/Herder.h"
 #include "herder/HerderPersistence.h"
+#include "history/HistoryArchiveManager.h"
 #include "history/HistoryManager.h"
 #include "invariant/AccountSubEntriesCountIsValid.h"
 #include "invariant/BucketListIsConsistentWithDatabase.h"
@@ -114,6 +115,7 @@ ApplicationImpl::initialize()
     mHerderPersistence = HerderPersistence::create(*this);
     mBucketManager = BucketManager::create(*this);
     mCatchupManager = CatchupManager::create(*this);
+    mHistoryArchiveManager = make_unique<HistoryArchiveManager>(*this);
     mHistoryManager = HistoryManager::create(*this);
     mInvariantManager = createInvariantManager();
     mMaintainer = make_unique<Maintainer>(*this);
@@ -654,6 +656,12 @@ CatchupManager&
 ApplicationImpl::getCatchupManager()
 {
     return *mCatchupManager;
+}
+
+HistoryArchiveManager&
+ApplicationImpl::getHistoryArchiveManager()
+{
+    return *mHistoryArchiveManager;
 }
 
 HistoryManager&
