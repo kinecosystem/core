@@ -341,8 +341,7 @@ HerderImpl::recvTransaction(TransactionFramePtr tx)
         return TX_STATUS_ERROR;
     }
 
-    if (!tx->isWhitelisted(mApp) &&
-        tx->getSourceAccount().getBalanceAboveReserve(mLedgerManager) < totFee)
+    if (tx->getSourceAccount().getAvailableBalance(mLedgerManager) < totFee)
     {
         tx->getResult().result.code(txINSUFFICIENT_BALANCE);
         return TX_STATUS_ERROR;
@@ -728,7 +727,7 @@ HerderImpl::triggerNextLedger(uint32_t ledgerSeqToTrigger)
     proposedSet->trimInvalid(mApp, removed);
     removeReceivedTxs(removed);
 
-    proposedSet->surgePricingFilter(mLedgerManager, mApp);
+    proposedSet->surgePricingFilter(mLedgerManager);
 
     if (!proposedSet->checkValid(mApp))
     {
