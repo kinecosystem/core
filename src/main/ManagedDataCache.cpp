@@ -10,9 +10,8 @@ namespace stellar
 void
 ManagedDataCache::update(Application& app)
 {
-    if (getAccount(app).size() == 0 || lcl >= app.getLedgerManager().getLedgerNum()){
+    if (getAccount(app).size() == 0 || lcl >= app.getLedgerManager().getLedgerNum())
         return;
-    }
 
     auto id = getAccount(app);
     AccountID aid(KeyUtils::fromStrKey<PublicKey>(id));

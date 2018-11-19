@@ -252,7 +252,7 @@ TransactionFrame::commonValid(SignatureChecker& signatureChecker,
     }
 
 	auto whitelisted =
-        Whitelist::instance(app)->isWhitelisted(mEnvelope.signatures, getContentsHash());
+        Whitelist::instance(app).isWhitelisted(mEnvelope.signatures, getContentsHash());
 
     if (!whitelisted && mEnvelope.tx.fee < getMinFee(lm))
     {
@@ -329,7 +329,7 @@ TransactionFrame::commonValid(SignatureChecker& signatureChecker,
 void
 TransactionFrame::processFeeSeqNum(LedgerDelta& delta,
                                    LedgerManager& ledgerManager,
-                                   Whitelist* whitelist)
+                                   Whitelist& whitelist)
 {
     resetSigningAccount();
     resetResults();
@@ -343,7 +343,7 @@ TransactionFrame::processFeeSeqNum(LedgerDelta& delta,
     Database& db = ledgerManager.getDatabase();
     int64_t& fee = getResult().feeCharged;
     auto whitelisted =
-        whitelist->isWhitelisted(mEnvelope.signatures, getContentsHash());
+        whitelist.isWhitelisted(mEnvelope.signatures, getContentsHash());
 
 	// whitelisted txs are not charged a fee
     if (!whitelisted && fee > 0)

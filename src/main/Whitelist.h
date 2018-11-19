@@ -8,7 +8,12 @@ namespace stellar
 class Whitelist : public ManagedDataCache
 {
   public:
-    static Whitelist* instance(Application& app);
+    Whitelist()
+    {
+        lcl = 0;
+    }
+
+    static Whitelist& instance(Application& app);
     size_t unwhitelistedReserve(size_t setSize);
 
     bool isWhitelisted(std::vector<DecoratedSignature> signatures,
@@ -23,12 +28,6 @@ class Whitelist : public ManagedDataCache
     virtual void fulfill(std::vector<DataFrame::pointer> dfs) override;
 
   private:
-    Whitelist()
-    {
-        lcl = 0;
-    }
-    static Whitelist* mINSTANCE;
-
     std::unordered_map<uint32_t, std::vector<string64>> whitelist;
 
 	// default to a 5% reserve

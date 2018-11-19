@@ -188,8 +188,9 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
         CLOG(WARNING, "Herder")
             << "surge pricing in effect! " << mTransactions.size();
 
-        auto reserveCapacity =
-            Whitelist::instance(app)->unwhitelistedReserve(max);
+        auto whitelist = Whitelist::instance(app);
+
+        auto reserveCapacity = whitelist.unwhitelistedReserve(max);
 
         // partition by whitelisting
         std::vector<TransactionFramePtr> whitelisted;
@@ -197,8 +198,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 
         for (auto& tx : mTransactions)
         {
-            if (Whitelist::instance(app)->isWhitelisted(
-                    tx->getEnvelope().signatures, tx->getContentsHash()))
+            if (whitelist.isWhitelisted(tx->getEnvelope().signatures, tx->getContentsHash()))
                 whitelisted.emplace_back(tx);
             else
                 unwhitelisted.emplace_back(tx);

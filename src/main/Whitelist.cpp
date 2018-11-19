@@ -7,21 +7,15 @@
 
 namespace stellar
 {
-
-Whitelist* Whitelist::mINSTANCE;
-
-
-Whitelist *Whitelist::instance(Application& app)
+Whitelist& Whitelist::instance(Application& app)
 {
-    if(!mINSTANCE){
-        mINSTANCE = new Whitelist;
-    }
-    mINSTANCE->update(app);
-    return mINSTANCE;
+    app.getWhitelist().update(app);
+    return app.getWhitelist();
 }
 
 std::string
-Whitelist::getAccount(Application& app){
+Whitelist::getAccount(Application& app)
+{
     return app.getConfig().WHITELIST;
 }
 
