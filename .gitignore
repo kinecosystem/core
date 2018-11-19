@@ -85,5 +85,3 @@
 # macos
 .DS_Store
 xcuserdata/
-
-/compile_commands.json
