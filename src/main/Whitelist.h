@@ -25,6 +25,8 @@ class Whitelist : public ManagedDataCache
     }
 
     virtual std::string getAccount(Application& app) override;
+    std::shared_ptr<AccountID> accountID(Application &app);
+
     virtual void fulfill(std::vector<DataFrame::pointer> dfs) override;
 
   private:

@@ -19,6 +19,16 @@ Whitelist::getAccount(Application& app)
     return app.getConfig().WHITELIST;
 }
 
+std::shared_ptr<AccountID>
+Whitelist::accountID(Application &app)
+{
+    auto account = getAccount(app);
+    if (account.size() == 0)
+        return std::shared_ptr<AccountID>(nullptr);
+
+    return std::make_shared<AccountID>(KeyUtils::fromStrKey<PublicKey>(account));
+}
+
 void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
 {
      whitelist.clear();
