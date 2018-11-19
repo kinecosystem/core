@@ -151,6 +151,16 @@ struct SurgeSorter
         if (tx1->getSourceID() == tx2->getSourceID())
             return tx1->getSeqNum() < tx2->getSeqNum();
 
+        // Txs from the whitelist holder get top priority
+        if (mWhitelistID != nullptr)
+        {
+            auto wlID = *mWhitelistID.get();
+            if (tx1->getSourceID() == wlID)
+                return true;
+            else if (tx2->getSourceID() == wlID)
+                return false;
+        }
+
         // whitelisted txs are not charged fees, so disregard them when
 		// sorting whitelisted txs
         if (mWhitelisted)
