@@ -8,24 +8,17 @@ namespace stellar
 class Whitelist : public ManagedDataCache
 {
   public:
-    Whitelist()
+    Whitelist(Application& app) : ManagedDataCache(app)
     {
-        lcl = 0;
     }
 
-    static Whitelist& instance(Application& app);
     size_t unwhitelistedReserve(size_t setSize);
 
     bool isWhitelisted(std::vector<DecoratedSignature> signatures,
                        Hash const& txHash);
     bool isWhitelistSig(DecoratedSignature const& sig, Hash const& txHash);
 
-    int getLastUpdated(){
-        return lcl;
-    }
-
-    virtual std::string getAccount(Application& app) override;
-    std::shared_ptr<AccountID> accountID(Application &app);
+    virtual std::string getAccount() override;
 
     virtual void fulfill(std::vector<DataFrame::pointer> dfs) override;
 
@@ -34,6 +27,5 @@ class Whitelist : public ManagedDataCache
 
 	// default to a 5% reserve
 	double mReserve = 0.05;
-	int lcl;
 };
 } // namespace stellar

@@ -123,7 +123,7 @@ ApplicationImpl::initialize()
     mBanManager = BanManager::create(*this);
     mStatusManager = make_unique<StatusManager>();
 
-    mWhitelist = make_unique<Whitelist>();
+    mWhitelist = make_unique<Whitelist>(*this);
 
     BucketListIsConsistentWithDatabase::registerInvariant(*this);
     AccountSubEntriesCountIsValid::registerInvariant(*this);
@@ -718,6 +718,7 @@ ApplicationImpl::getStatusManager()
 Whitelist&
 ApplicationImpl::getWhitelist()
 {
+    mWhitelist.get()->update();
     return *mWhitelist;
 }
 

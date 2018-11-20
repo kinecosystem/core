@@ -11,10 +11,21 @@ namespace stellar
 class ManagedDataCache
 {
   public:
-    void update(Application& app);
-    virtual std::string getAccount(Application& app) = 0;
+    ManagedDataCache(Application& app) : mApp(app)
+    {
+        lcl = 0;
+    }
+
+    std::shared_ptr<AccountID> accountID();
+
+    void update();
+    virtual std::string getAccount() = 0;
     virtual void fulfill(std::vector<DataFrame::pointer> dfs) = 0;
+
   protected:
+    Application& mApp;
+
+  private:
     int lcl = 0;
 };
 }

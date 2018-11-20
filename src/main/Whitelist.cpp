@@ -7,26 +7,10 @@
 
 namespace stellar
 {
-Whitelist& Whitelist::instance(Application& app)
-{
-    app.getWhitelist().update(app);
-    return app.getWhitelist();
-}
-
 std::string
-Whitelist::getAccount(Application& app)
+Whitelist::getAccount()
 {
-    return app.getConfig().WHITELIST;
-}
-
-std::shared_ptr<AccountID>
-Whitelist::accountID(Application &app)
-{
-    auto account = getAccount(app);
-    if (account.size() == 0)
-        return std::shared_ptr<AccountID>(nullptr);
-
-    return std::make_shared<AccountID>(KeyUtils::fromStrKey<PublicKey>(account));
+    return mApp.getConfig().WHITELIST;
 }
 
 void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)

@@ -7,19 +7,29 @@
 
 namespace stellar
 {
-void
-ManagedDataCache::update(Application& app)
+std::shared_ptr<AccountID>
+ManagedDataCache::accountID()
 {
-    if (getAccount(app).size() == 0 || lcl >= app.getLedgerManager().getLedgerNum())
+    auto account = getAccount();
+    if (account.size() == 0)
+        return std::shared_ptr<AccountID>(nullptr);
+
+    return std::make_shared<AccountID>(KeyUtils::fromStrKey<PublicKey>(account));
+}
+
+void
+ManagedDataCache::update()
+{
+    auto id = getAccount();
+
+    if (id.size() == 0 || lcl >= mApp.getLedgerManager().getLedgerNum())
         return;
 
-    auto id = getAccount(app);
     AccountID aid(KeyUtils::fromStrKey<PublicKey>(id));
-    auto dfs = DataFrame::loadAccountData(app.getDatabase(), aid);
+    auto dfs = DataFrame::loadAccountData(mApp.getDatabase(), aid);
 
     // Handle dataframe objects
     fulfill(dfs);
-    lcl = app.getLedgerManager().getLastClosedLedgerNum();
+    lcl = mApp.getLedgerManager().getLastClosedLedgerNum();
 }
-
 }

@@ -252,7 +252,7 @@ TransactionFrame::commonValid(SignatureChecker& signatureChecker,
     }
 
 	auto whitelisted =
-        Whitelist::instance(app).isWhitelisted(mEnvelope.signatures, getContentsHash());
+        app.getWhitelist().isWhitelisted(mEnvelope.signatures, getContentsHash());
 
     if (!whitelisted && mEnvelope.tx.fee < getMinFee(lm))
     {

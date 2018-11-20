@@ -190,7 +190,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
         CLOG(WARNING, "Herder")
             << "surge pricing in effect! " << mTransactions.size();
 
-        auto whitelist = Whitelist::instance(app);
+        auto whitelist = app.getWhitelist();
 
         auto reserveCapacity = whitelist.unwhitelistedReserve(max);
 
@@ -220,7 +220,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 
         // sort whitelisted by sourceID and seqNum
         std::sort(whitelisted.begin(), whitelisted.end(),
-                  SurgeSorter(accountFeeMap, true, whitelist.accountID(app)));
+                  SurgeSorter(accountFeeMap, true, whitelist.accountID()));
 
         // remove the over-capacity txs
         if (whitelisted.size() > (max - reserveCapacity))
@@ -246,7 +246,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
         // remove the bottom that aren't paying enough
         std::vector<TransactionFramePtr> tempList = unwhitelisted;
         std::sort(tempList.begin(), tempList.end(),
-                  SurgeSorter(accountFeeMap, false, whitelist.accountID(app)));
+                  SurgeSorter(accountFeeMap, false, whitelist.accountID()));
 
         for (auto iter = tempList.begin() + totalCapacity;
              iter != tempList.end(); iter++)
