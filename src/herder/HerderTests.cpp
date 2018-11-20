@@ -350,6 +350,8 @@ TEST_CASE("whitelist", "[herder]")
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
         // Checking account balance
         auto balance = accountWLBase.getBalance();
 
@@ -372,7 +374,7 @@ TEST_CASE("whitelist", "[herder]")
         REQUIRE(txSet->mTransactions.size() == 2);
         REQUIRE(txSet->checkValid(*app));
 
-        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+        closeLedgerOn(*app, 3, 4, 11, 2018, txSet->mTransactions);
         REQUIRE(accountWLBase.getBalance() == 0);
         REQUIRE(base.getBalance() == balance);
         REQUIRE(base1.getBalance() == 0);
@@ -391,6 +393,8 @@ TEST_CASE("whitelist", "[herder]")
 
         whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
                              &value);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
         auto amountToPay = 50;
 
@@ -436,6 +440,8 @@ TEST_CASE("whitelist", "[herder]")
         whitelist.manageData(KeyUtils::toStrKey(accountWL2.getPublicKey()),
                              &value1);
 
+        closeLedgerOn(*app, 3, 4, 11, 2018, txSet->mTransactions);
+
         REQUIRE(!app->getWhitelist().isWhitelisted(
             tx->getEnvelope().signatures, tx->getContentsHash()));
         REQUIRE(app->getWhitelist().isWhitelisted(
@@ -456,6 +462,8 @@ TEST_CASE("whitelist", "[herder]")
         DataValue value2;
         whitelist.manageData(KeyUtils::toStrKey(accountWL2.getPublicKey()),
                              &value2);
+
+        closeLedgerOn(*app, 4, 4, 11, 2018, txSet->mTransactions);
 
         REQUIRE(!app->getWhitelist().isWhitelisted(
             tx->getEnvelope().signatures, tx->getContentsHash()));
@@ -483,6 +491,10 @@ TEST_CASE("whitelist", "[herder]")
 
         whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
                              &value);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
 
         int wlCount = 0;
         // adding non-whitelisted tx to the set
@@ -535,6 +547,10 @@ TEST_CASE("whitelist", "[herder]")
         whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
                              &value);
 
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
         int wlCount = 0;
         // adding non-whitelisted tx to the set
         for (int n = 0; n < 2; n++)
@@ -572,7 +588,6 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("non whitelist with 0 fee")
     {
-
         DataValue value;
         value.resize(4);
         SignatureHint hint =
@@ -586,6 +601,8 @@ TEST_CASE("whitelist", "[herder]")
 
         whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
                              &value);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
         int wlCount = 0;
         // adding non-whitelisted tx to the set
@@ -639,6 +656,11 @@ TEST_CASE("whitelist", "[herder]")
 
         whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
                              &value);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
         auto dfs = DataFrame::loadAccountData(app->getDatabase(),
                                               whitelist.getPublicKey());
 
@@ -686,6 +708,11 @@ TEST_CASE("whitelist", "[herder]")
 
         whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
                              &value);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
         auto dfs = DataFrame::loadAccountData(app->getDatabase(),
                                               whitelist.getPublicKey());
 
@@ -722,7 +749,6 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("non whitelist pays more fee")
     {
-
         DataValue value;
         value.resize(4);
         SignatureHint hint =
@@ -736,6 +762,11 @@ TEST_CASE("whitelist", "[herder]")
 
         whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
                              &value);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
         auto dfs = DataFrame::loadAccountData(app->getDatabase(),
                                               whitelist.getPublicKey());
 
@@ -777,7 +808,6 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("fees sorting check for non whitelisted accounts")
     {
-
         DataValue value;
         value.resize(4);
         SignatureHint hint =
@@ -791,6 +821,11 @@ TEST_CASE("whitelist", "[herder]")
 
         whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
                              &value);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
         auto dfs = DataFrame::loadAccountData(app->getDatabase(),
                                               whitelist.getPublicKey());
 
@@ -838,13 +873,12 @@ TEST_CASE("whitelist", "[herder]")
         REQUIRE(txSet->mTransactions.size() == 20);
         REQUIRE(wlCount == 19);
         REQUIRE(txSet->checkValid(*app));
-        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+        closeLedgerOn(*app, 3, 4, 11, 2018, txSet->mTransactions);
         REQUIRE(accountWL.getBalance() + wlAmount == wlBalance);
     }
 
     SECTION("whitelisted only")
     {
-
         DataValue value;
         value.resize(4);
         SignatureHint hint =
@@ -858,6 +892,11 @@ TEST_CASE("whitelist", "[herder]")
 
         whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
                              &value);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
         auto dfs = DataFrame::loadAccountData(app->getDatabase(),
                                               whitelist.getPublicKey());
 
@@ -891,13 +930,12 @@ TEST_CASE("whitelist", "[herder]")
         REQUIRE(txSet->mTransactions.size() == 20);
         REQUIRE(wlCount == 20);
         REQUIRE(txSet->checkValid(*app));
-        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+        closeLedgerOn(*app, 3, 4, 11, 2018, txSet->mTransactions);
         REQUIRE(accountWL.getBalance() + wlAmount == wlBalance);
     }
 
     SECTION("fees sorting check for whitelisted accounts")
     {
-
         DataValue value;
         value.resize(4);
         SignatureHint hint =
@@ -921,6 +959,10 @@ TEST_CASE("whitelist", "[herder]")
 
         whitelist.manageData(KeyUtils::toStrKey(accountWL2.getPublicKey()),
                              &value1);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
 
         int wlCount = 0;
         int wlAmount = 0;
@@ -959,20 +1001,21 @@ TEST_CASE("whitelist", "[herder]")
         // validating the tx
         for (auto& tx3 : txSet->mTransactions)
         {
-
             if (tx3->getSourceID() == accountWL.getPublicKey() ||
                 tx3->getSourceID() == accountWL2.getPublicKey())
             {
                 wlCount++;
             }
             else
+            {
                 REQUIRE(tx3->getSourceID() == accountC.getPublicKey());
+            }
         }
 
         REQUIRE(txSet->mTransactions.size() == 20);
         REQUIRE(wlCount == 19);
         REQUIRE(txSet->checkValid(*app));
-        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+        closeLedgerOn(*app, 3, 4, 11, 2018, txSet->mTransactions);
         REQUIRE(accountWL2.getBalance() + wlAmount == wl2Balance);
         REQUIRE(accountWL.getBalance() == wlBalance);
     }
