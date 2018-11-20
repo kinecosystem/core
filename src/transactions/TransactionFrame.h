@@ -38,8 +38,8 @@ using TransactionFramePtr = std::shared_ptr<TransactionFrame>;
 class TransactionFrame
 {
   private:
-    bool mCheckedWhitelist = false;
     bool mIsWhitelisted = false;
+    uint32_t mCheckedLedger = 0;
 
   protected:
     TransactionEnvelope mEnvelope;

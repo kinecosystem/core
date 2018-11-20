@@ -28,6 +28,6 @@ class ManagedDataCache
     Application& mApp;
 
   private:
-    int lcl = 0;
+    uint32_t lcl = 0;
 };
 }
