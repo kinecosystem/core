@@ -37,6 +37,10 @@ using TransactionFramePtr = std::shared_ptr<TransactionFrame>;
 
 class TransactionFrame
 {
+  private:
+    bool mCheckedWhitelist = false;
+    bool mIsWhitelisted = false;
+
   protected:
     TransactionEnvelope mEnvelope;
     TransactionResult mResult;
@@ -81,6 +85,8 @@ class TransactionFrame
 
     Hash const& getFullHash() const;
     Hash const& getContentsHash() const;
+
+    bool isWhitelisted(Application& app);
 
     std::vector<std::shared_ptr<OperationFrame>> const&
     getOperations() const
@@ -145,7 +151,7 @@ class TransactionFrame
 
     // collect fee, consume sequence number
     void processFeeSeqNum(LedgerDelta& delta, LedgerManager& ledgerManager,
-                          Whitelist& whitelist);
+                          Application& app);
 
     // apply this transaction to the current ledger
     // returns true if successfully applied

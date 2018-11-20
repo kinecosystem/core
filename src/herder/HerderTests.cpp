@@ -348,6 +348,8 @@ TEST_CASE("whitelist", "[herder]")
         whitelist.manageData(KeyUtils::toStrKey(accountWLBase.getPublicKey()),
                              &value);
 
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
         // Checking account balance
         auto balance = accountWLBase.getBalance();
 

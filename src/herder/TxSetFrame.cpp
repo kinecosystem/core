@@ -210,7 +210,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 
         for (auto& tx : mTransactions)
         {
-            if (whitelist.isWhitelisted(tx->getEnvelope().signatures, tx->getContentsHash()))
+            if (tx->isWhitelisted(app))
                 whitelisted.emplace_back(tx);
             else
                 unwhitelisted.emplace_back(tx);

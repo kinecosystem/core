@@ -22,7 +22,7 @@ ManagedDataCache::update()
 {
     auto id = getAccount();
 
-    if (id.size() == 0 || lcl >= mApp.getLedgerManager().getLedgerNum())
+    if (id.size() == 0 || lcl >= mApp.getLedgerManager().getLastClosedLedgerNum())
         return;
 
     AccountID aid(KeyUtils::fromStrKey<PublicKey>(id));

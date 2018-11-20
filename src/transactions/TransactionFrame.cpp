@@ -79,6 +79,19 @@ TransactionFrame::clearCached()
     mFullHash = zero;
 }
 
+bool
+TransactionFrame::isWhitelisted(Application& app)
+{
+    if (!mCheckedWhitelist)
+    {
+        mIsWhitelisted = app.getWhitelist().isWhitelisted(getEnvelope().signatures,
+                                                          getContentsHash());
+        mCheckedWhitelist = true;
+    }
+
+    return mIsWhitelisted;
+}
+
 TransactionResultPair
 TransactionFrame::getResultPair() const
 {
@@ -251,8 +264,7 @@ TransactionFrame::commonValid(SignatureChecker& signatureChecker,
         }
     }
 
-	auto whitelisted =
-        app.getWhitelist().isWhitelisted(mEnvelope.signatures, getContentsHash());
+    auto whitelisted = isWhitelisted(app);
 
     if (!whitelisted && mEnvelope.tx.fee < getMinFee(lm))
     {
@@ -329,7 +341,7 @@ TransactionFrame::commonValid(SignatureChecker& signatureChecker,
 void
 TransactionFrame::processFeeSeqNum(LedgerDelta& delta,
                                    LedgerManager& ledgerManager,
-                                   Whitelist& whitelist)
+                                   Application& app)
 {
     resetSigningAccount();
     resetResults();
@@ -342,8 +354,7 @@ TransactionFrame::processFeeSeqNum(LedgerDelta& delta,
 
     Database& db = ledgerManager.getDatabase();
     int64_t& fee = getResult().feeCharged;
-    auto whitelisted =
-        whitelist.isWhitelisted(mEnvelope.signatures, getContentsHash());
+    auto whitelisted = isWhitelisted(app);
 
 	// whitelisted txs are not charged a fee
     if (!whitelisted && fee > 0)

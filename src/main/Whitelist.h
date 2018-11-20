@@ -1,3 +1,5 @@
+#pragma once
+
 #include "main/Application.h"
 #include "main/ManagedDataCache.h"
 #include "ledger/LedgerManager.h"
