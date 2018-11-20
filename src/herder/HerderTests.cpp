@@ -419,14 +419,10 @@ TEST_CASE("whitelist", "[herder]")
                           accountB.op(payment(destAccount, amountToPay))});
         tx2->addSignature(accountB.getSecretKey());
 
-        REQUIRE(!app->getWhitelist().isWhitelisted(
-            tx->getEnvelope().signatures, tx->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx1->getEnvelope().signatures, tx1->getContentsHash()));
-        REQUIRE(!app->getWhitelist().isWhitelisted(
-            tx2->getEnvelope().signatures, tx2->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx3->getEnvelope().signatures, tx3->getContentsHash()));
+        REQUIRE(!tx->isWhitelisted(*app));
+        REQUIRE(tx1->isWhitelisted(*app));
+        REQUIRE(!tx2->isWhitelisted(*app));
+        REQUIRE(tx3->isWhitelisted(*app));
 
         DataValue value1;
         value1.resize(4);
@@ -442,22 +438,10 @@ TEST_CASE("whitelist", "[herder]")
 
         closeLedgerOn(*app, 3, 4, 11, 2018, txSet->mTransactions);
 
-        REQUIRE(!app->getWhitelist().isWhitelisted(
-            tx->getEnvelope().signatures, tx->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx1->getEnvelope().signatures, tx1->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx2->getEnvelope().signatures, tx2->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx3->getEnvelope().signatures, tx3->getContentsHash()));
-        REQUIRE(!app->getWhitelist().isWhitelisted(
-            tx->getEnvelope().signatures, tx->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx1->getEnvelope().signatures, tx1->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx2->getEnvelope().signatures, tx2->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx3->getEnvelope().signatures, tx3->getContentsHash()));
+        REQUIRE(!tx->isWhitelisted(*app));
+        REQUIRE(tx1->isWhitelisted(*app));
+        REQUIRE(tx2->isWhitelisted(*app));
+        REQUIRE(tx3->isWhitelisted(*app));
 
         DataValue value2;
         whitelist.manageData(KeyUtils::toStrKey(accountWL2.getPublicKey()),
@@ -465,14 +449,10 @@ TEST_CASE("whitelist", "[herder]")
 
         closeLedgerOn(*app, 4, 4, 11, 2018, txSet->mTransactions);
 
-        REQUIRE(!app->getWhitelist().isWhitelisted(
-            tx->getEnvelope().signatures, tx->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx1->getEnvelope().signatures, tx1->getContentsHash()));
-        REQUIRE(!app->getWhitelist().isWhitelisted(
-            tx2->getEnvelope().signatures, tx2->getContentsHash()));
-        REQUIRE(app->getWhitelist().isWhitelisted(
-            tx3->getEnvelope().signatures, tx3->getContentsHash()));
+        REQUIRE(!tx->isWhitelisted(*app));
+        REQUIRE(tx1->isWhitelisted(*app));
+        REQUIRE(!tx2->isWhitelisted(*app));
+        REQUIRE(tx3->isWhitelisted(*app));
     }
 
     SECTION("whitelist default set size")
