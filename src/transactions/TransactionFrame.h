@@ -60,7 +60,7 @@ class TransactionFrame
                      LedgerDelta* delta, SequenceNumber current);
 
     void resetSigningAccount();
-    void resetResults();
+    void resetResults(Application& app);
     void removeUsedOneTimeSignerKeys(SignatureChecker& signatureChecker,
                                      LedgerDelta& delta,
                                      LedgerManager& ledgerManager);

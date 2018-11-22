@@ -202,7 +202,7 @@ TransactionFrame::loadAccount(int ledgerProtocolVersion, LedgerDelta* delta,
 }
 
 void
-TransactionFrame::resetResults()
+TransactionFrame::resetResults(Application& app)
 {
     // pre-allocates the results for all operations
     getResult().result.code(txSUCCESS);
@@ -221,7 +221,7 @@ TransactionFrame::resetResults()
 
     // feeCharged is updated accordingly to represent the cost of the
     // transaction regardless of the failure modes.
-    getResult().feeCharged = getFee();
+    getResult().feeCharged = isWhitelisted(app) ? 0 : getFee();
 }
 
 bool
@@ -345,7 +345,7 @@ TransactionFrame::processFeeSeqNum(LedgerDelta& delta,
                                    Application& app)
 {
     resetSigningAccount();
-    resetResults();
+    resetResults(app);
 
     if (!loadAccount(ledgerManager.getCurrentLedgerVersion(), &delta,
                      ledgerManager.getDatabase()))
@@ -441,7 +441,7 @@ bool
 TransactionFrame::checkValid(Application& app, SequenceNumber current)
 {
     resetSigningAccount();
-    resetResults();
+    resetResults(app);
     SignatureChecker signatureChecker{
         app.getLedgerManager().getCurrentLedgerVersion(), getContentsHash(),
         mEnvelope.signatures, app};
