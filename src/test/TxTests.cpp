@@ -10,6 +10,7 @@
 #include "ledger/DataFrame.h"
 #include "ledger/LedgerDelta.h"
 #include "main/Application.h"
+#include "main/Whitelist.h"
 #include "test/TestExceptions.h"
 #include "test/TestUtils.h"
 #include "test/test.h"
@@ -137,8 +138,9 @@ applyCheck(TransactionFramePtr tx, Application& app, bool checkSeqNum)
         auto acnt = loadAccount(tx->getSourceID(), app, true);
         srcAccountBefore = acnt->getAccount();
 
+        auto wl = Whitelist(app);
         // no account -> can't process the fee
-        tx->processFeeSeqNum(delta, app.getLedgerManager());
+        tx->processFeeSeqNum(delta, app.getLedgerManager(), wl);
 
         // verify that the fee got processed
         auto added = delta.added();
@@ -945,5 +947,5 @@ checkTx(int index, TxSetResultMeta& r, TransactionResultCode expected,
     checkTx(index, r, expected);
     REQUIRE(r[index].first.result.result.results()[0].code() == code);
 };
-}
-}
+} // namespace txtest
+} // namespace stellar
