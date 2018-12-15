@@ -352,7 +352,8 @@ HerderImpl::recvTransaction(TransactionFramePtr tx)
         return TX_STATUS_ERROR;
     }
 
-    if (tx->getSourceAccount().getAvailableBalance(mLedgerManager) < totFee)
+    if (!tx->isWhitelisted(mApp) &&
+        tx->getSourceAccount().getAvailableBalance(mLedgerManager) < totFee)
     {
         tx->getResult().result.code(txINSUFFICIENT_BALANCE);
         return TX_STATUS_ERROR;
