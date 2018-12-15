@@ -250,7 +250,10 @@ TransactionFrame::commonValidPreSeqNum(Application& app, LedgerDelta* delta)
         }
     }
 
-    if (mEnvelope.tx.fee < getMinFee(lm))
+	auto whitelisted =
+        Whitelist(app).isWhitelisted(mEnvelope.signatures, getContentsHash());
+
+    if (mEnvelope.tx.fee < getMinFee(lm) && !whitelisted)
     {
         app.getMetrics()
             .NewMeter({"transaction", "invalid", "insufficient-fee"},
@@ -378,11 +381,14 @@ TransactionFrame::commonValid(SignatureChecker& signatureChecker,
 
     res = ValidationType::kInvalidPostAuth;
 
+    auto whitelisted = Whitelist(app).isWhitelisted(mEnvelope.signatures, getContentsHash());
+
     // if we are in applying mode fee was already deduced from signing account
     // balance, if not, we need to check if after that deduction this account
     // will still have minimum balance
     uint32_t feeToPay =
         (applying && (lm.getCurrentLedgerVersion() > 8)) ? 0 : mEnvelope.tx.fee;
+    feeToPay = whitelisted ? 0 : feeToPay;
     // don't let the account go below the reserve after accounting for
     // liabilities
     if (mSigningAccount->getAvailableBalance(lm) < feeToPay)
