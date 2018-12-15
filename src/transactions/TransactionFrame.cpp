@@ -253,7 +253,7 @@ TransactionFrame::commonValidPreSeqNum(Application& app, LedgerDelta* delta)
 	auto whitelisted =
         Whitelist::instance(app)->isWhitelisted(mEnvelope.signatures, getContentsHash());
 
-    if (mEnvelope.tx.fee < getMinFee(lm) && !whitelisted)
+    if (!whitelisted && mEnvelope.tx.fee < getMinFee(lm))
     {
         app.getMetrics()
             .NewMeter({"transaction", "invalid", "insufficient-fee"},
