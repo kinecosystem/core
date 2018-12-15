@@ -36,6 +36,10 @@ using TransactionFramePtr = std::shared_ptr<TransactionFrame>;
 
 class TransactionFrame
 {
+  private:
+    bool mIsWhitelisted = false;
+    uint32_t mCheckedLedger = 0;
+
   protected:
     TransactionEnvelope mEnvelope;
     TransactionResult mResult;
@@ -68,7 +72,7 @@ class TransactionFrame
                                SequenceNumber current);
 
     void resetSigningAccount();
-    void resetResults();
+    void resetResults(Application& app);
     void removeUsedOneTimeSignerKeys(SignatureChecker& signatureChecker,
                                      LedgerDelta& delta,
                                      LedgerManager& ledgerManager);
@@ -100,6 +104,8 @@ class TransactionFrame
 
     Hash const& getFullHash() const;
     Hash const& getContentsHash() const;
+
+    bool isWhitelisted(Application& app);
 
     std::vector<std::shared_ptr<OperationFrame>> const&
     getOperations() const
@@ -164,7 +170,7 @@ class TransactionFrame
 
     // collect fee, consume sequence number
     void processFeeSeqNum(LedgerDelta& delta, LedgerManager& ledgerManager,
-                          Whitelist* whitelist);
+                          Application& app);
 
     // apply this transaction to the current ledger
     // returns true if successfully applied

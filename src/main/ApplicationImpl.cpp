@@ -124,7 +124,7 @@ ApplicationImpl::initialize()
     mBanManager = BanManager::create(*this);
     mStatusManager = std::make_unique<StatusManager>();
 
-    mWhitelist = make_unique<Whitelist>(*this);
+    mWhitelist = std::make_unique<Whitelist>(*this);
 
     BucketListIsConsistentWithDatabase::registerInvariant(*this);
     AccountSubEntriesCountIsValid::registerInvariant(*this);
@@ -246,7 +246,6 @@ ApplicationImpl::getJsonInfo()
     info["peers"]["authenticated_count"] =
         getOverlayManager().getAuthenticatedPeersCount();
     info["network"] = getConfig().NETWORK_PASSPHRASE;
-    info["whitelist"] = getConfig().WHITELIST;
 
     auto& statusMessages = getStatusManager();
     auto counter = 0;

@@ -43,7 +43,7 @@ SignatureChecker::checkSignature(AccountID const& accountID,
     {
         auto const& sig = mSignatures[i];
 
-        if (Whitelist::instance(mApp)->isWhitelistSig(sig, mContentsHash))
+        if (mApp.getWhitelist().isWhitelistSig(sig, mContentsHash))
             mUsedSignatures[i] = true;
 	}
 

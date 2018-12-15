@@ -137,8 +137,10 @@ struct SurgeSorter
 {
     map<AccountID, double>& mAccountFeeMap;
     bool mWhitelisted;
-    SurgeSorter(map<AccountID, double>& afm, bool whitelisted)
-        : mAccountFeeMap(afm), mWhitelisted(whitelisted)
+    std::shared_ptr<AccountID> const& mWhitelistID;
+    SurgeSorter(map<AccountID, double>& afm, bool whitelisted,
+                std::shared_ptr<AccountID> whitelistID)
+        : mAccountFeeMap(afm), mWhitelisted(whitelisted), mWhitelistID(whitelistID)
     {
     }
 
@@ -147,6 +149,16 @@ struct SurgeSorter
     {
         if (tx1->getSourceID() == tx2->getSourceID())
             return tx1->getSeqNum() < tx2->getSeqNum();
+
+        // Txs from the whitelist holder get top priority
+        if (mWhitelistID != nullptr)
+        {
+            auto wlID = *mWhitelistID.get();
+            if (tx1->getSourceID() == wlID)
+                return true;
+            else if (tx2->getSourceID() == wlID)
+                return false;
+        }
 
         // whitelisted txs are not charged fees, so disregard them when
 		// sorting whitelisted txs
@@ -187,8 +199,9 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
         CLOG(WARNING, "Herder")
             << "surge pricing in effect! " << mTransactions.size();
 
-        auto reserveCapacity =
-            Whitelist::instance(app)->unwhitelistedReserve(max);
+        auto whitelist = app.getWhitelist();
+
+        auto reserveCapacity = whitelist.unwhitelistedReserve(max);
 
         // partition by whitelisting
         std::vector<TransactionFramePtr> whitelisted;
@@ -196,8 +209,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 
         for (auto& tx : mTransactions)
         {
-            if (Whitelist::instance(app)->isWhitelisted(
-                    tx->getEnvelope().signatures, tx->getContentsHash()))
+            if (tx->isWhitelisted(app))
                 whitelisted.emplace_back(tx);
             else
                 unwhitelisted.emplace_back(tx);
@@ -217,7 +229,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 
         // sort whitelisted by sourceID and seqNum
         std::sort(whitelisted.begin(), whitelisted.end(),
-                  SurgeSorter(accountFeeMap, true));
+                  SurgeSorter(accountFeeMap, true, whitelist.accountID()));
 
         // remove the over-capacity txs
         if (whitelisted.size() > (max - reserveCapacity))
@@ -243,7 +255,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
         // remove the bottom that aren't paying enough
         std::vector<TransactionFramePtr> tempList = unwhitelisted;
         std::sort(tempList.begin(), tempList.end(),
-                  SurgeSorter(accountFeeMap, false));
+                  SurgeSorter(accountFeeMap, false, whitelist.accountID()));
 
         for (auto iter = tempList.begin() + totalCapacity;
              iter != tempList.end(); iter++)
