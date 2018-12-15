@@ -1,5 +1,6 @@
 #include "main/ManagedDataCache.h"
 #include "ledger/DataFrame.h"
+#include "ledger/LedgerManager.h"
 #include "transactions/SignatureUtils.h"
 #include "transactions/TransactionFrame.h"
 #include <stdint.h>
@@ -7,31 +8,20 @@
 
 namespace stellar
 {
-std::shared_ptr<AccountID>
-ManagedDataCache::accountID()
-{
-    auto account = getAccount();
-    if (account.size() == 0)
-        return std::shared_ptr<AccountID>(nullptr);
-
-    return std::make_shared<AccountID>(KeyUtils::fromStrKey<PublicKey>(account));
-}
-
 void
-ManagedDataCache::update()
+ManagedDataCache::update(Application& app)
 {
-    auto id = getAccount();
-
-    if (id.size() == 0 || needsUpdate == false)
+    if (getAccount(app).size() == 0 || lcl >= app.getLedgerManager().getLedgerNum()){
         return;
+    }
 
+    auto id = getAccount(app);
     AccountID aid(KeyUtils::fromStrKey<PublicKey>(id));
-    auto dfs = DataFrame::loadAccountData(mApp.getDatabase(), aid);
+    auto dfs = DataFrame::loadAccountData(app.getDatabase(), aid);
 
     // Handle dataframe objects
     fulfill(dfs);
-    
-    needsUpdate = false;
-    updateCounter++;
+    lcl = app.getLedgerManager().getLastClosedLedgerNum();
 }
+
 }

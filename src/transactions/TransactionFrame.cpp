@@ -424,7 +424,8 @@ TransactionFrame::processFeeSeqNum(LedgerDelta& delta,
     auto whitelisted =
         whitelist->isWhitelisted(mEnvelope.signatures, getContentsHash());
 
-    if (fee > 0 && !whitelisted)
+	// whitelisted txs are not charged a fee
+    if (!whitelisted && fee > 0)
     {
         fee = std::min(mSigningAccount->getAccount().balance, fee);
         // Note: AccountFrame::addBalance checks that reserve plus liabilities
