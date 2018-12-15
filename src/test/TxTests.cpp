@@ -158,7 +158,8 @@ applyCheck(TransactionFramePtr tx, Application& app, bool checkSeqNum)
             REQUIRE(prevAccount == srcAccountBefore);
             auto curAccount = m.current->mEntry.data.account();
             // the balance should have changed
-            REQUIRE(curAccount.balance < prevAccount.balance);
+            if (!tx->isWhitelisted(app))
+                REQUIRE(curAccount.balance < prevAccount.balance);
             curAccount.balance = prevAccount.balance;
             if (app.getLedgerManager().getCurrentLedgerVersion() <= 9)
             {
@@ -270,7 +271,9 @@ void
 checkTransaction(TransactionFrame& txFrame, Application& app)
 {
     REQUIRE(txFrame.getResult().feeCharged ==
-            app.getLedgerManager().getTxFee());
+            (txFrame.isWhitelisted(app)
+             ? 0
+             : app.getLedgerManager().getTxFee()));
     REQUIRE((txFrame.getResultCode() == txSUCCESS ||
              txFrame.getResultCode() == txFAILED));
 }
