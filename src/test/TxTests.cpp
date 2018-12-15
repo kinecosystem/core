@@ -138,7 +138,7 @@ applyCheck(TransactionFramePtr tx, Application& app, bool checkSeqNum)
         auto acnt = loadAccount(tx->getSourceID(), app, true);
         srcAccountBefore = acnt->getAccount();
 
-        auto wl = Whitelist(app);
+        auto wl = Whitelist::instance(app);
         // no account -> can't process the fee
         tx->processFeeSeqNum(delta, app.getLedgerManager(), wl);
 

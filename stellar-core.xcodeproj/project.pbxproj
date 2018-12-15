@@ -320,6 +320,7 @@
 		82DA9BC921C3C34C005AFC77 /* LiabilitiesTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BC821C3C34C005AFC77 /* LiabilitiesTests.cpp */; };
 		82DA9BCC21C3C3BD005AFC77 /* PeerSharedKeyId.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BCB21C3C3BD005AFC77 /* PeerSharedKeyId.cpp */; };
 		82DA9BCF21C56B2A005AFC77 /* Whitelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BCE21C56B29005AFC77 /* Whitelist.cpp */; };
+		82DA9BD221C56F18005AFC77 /* ManagedObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BD121C56F17005AFC77 /* ManagedObject.cpp */; };
 		82DC9B0C21A2701D0082860C /* ConservationOfLumens.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DC9B0921A2701D0082860C /* ConservationOfLumens.cpp */; };
 		82DC9B0D21A2701D0082860C /* ConservationOfLumensTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DC9B0B21A2701D0082860C /* ConservationOfLumensTests.cpp */; };
 		82DC9B1021A270490082860C /* InflationOpFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DC9B0E21A270490082860C /* InflationOpFrame.cpp */; };
@@ -1653,6 +1654,8 @@
 		82DA9BCB21C3C3BD005AFC77 /* PeerSharedKeyId.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PeerSharedKeyId.cpp; sourceTree = "<group>"; };
 		82DA9BCD21C56B22005AFC77 /* Whitelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Whitelist.h; sourceTree = "<group>"; };
 		82DA9BCE21C56B29005AFC77 /* Whitelist.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Whitelist.cpp; sourceTree = "<group>"; };
+		82DA9BD021C56F14005AFC77 /* ManagedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManagedObject.h; sourceTree = "<group>"; };
+		82DA9BD121C56F17005AFC77 /* ManagedObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ManagedObject.cpp; sourceTree = "<group>"; };
 		82DC9B0921A2701D0082860C /* ConservationOfLumens.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConservationOfLumens.cpp; sourceTree = "<group>"; };
 		82DC9B0B21A2701D0082860C /* ConservationOfLumensTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConservationOfLumensTests.cpp; sourceTree = "<group>"; };
 		82DC9B0E21A270490082860C /* InflationOpFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InflationOpFrame.cpp; sourceTree = "<group>"; };
@@ -2225,6 +2228,8 @@
 				82000876219E7EBD0079CDCA /* main.cpp */,
 				82000848219E7EBD0079CDCA /* Maintainer.cpp */,
 				82000847219E7EBD0079CDCA /* Maintainer.h */,
+				82DA9BD121C56F17005AFC77 /* ManagedObject.cpp */,
+				82DA9BD021C56F14005AFC77 /* ManagedObject.h */,
 				82000834219E7EBD0079CDCA /* NtpSynchronizationChecker.cpp */,
 				8200083B219E7EBD0079CDCA /* NtpSynchronizationChecker.h */,
 				82000832219E7EBD0079CDCA /* PersistentState.cpp */,
@@ -3958,6 +3963,7 @@
 				82000ACE219E7EBE0079CDCA /* CatchupManagerImpl.cpp in Sources */,
 				82001CC0219E7FB10079CDCA /* exp_decay_sample.cc in Sources */,
 				82000A95219E7EBE0079CDCA /* Config.cpp in Sources */,
+				82DA9BD221C56F18005AFC77 /* ManagedObject.cpp in Sources */,
 				82000966219E7EBD0079CDCA /* LedgerDeltaTests.cpp in Sources */,
 				82000A3B219E7EBE0079CDCA /* Upgrades.cpp in Sources */,
 				8200096E219E7EBD0079CDCA /* InvariantTestUtils.cpp in Sources */,

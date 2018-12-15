@@ -251,7 +251,7 @@ TransactionFrame::commonValidPreSeqNum(Application& app, LedgerDelta* delta)
     }
 
 	auto whitelisted =
-        Whitelist(app).isWhitelisted(mEnvelope.signatures, getContentsHash());
+        Whitelist::instance(app)->isWhitelisted(mEnvelope.signatures, getContentsHash());
 
     if (mEnvelope.tx.fee < getMinFee(lm) && !whitelisted)
     {
@@ -381,7 +381,8 @@ TransactionFrame::commonValid(SignatureChecker& signatureChecker,
 
     res = ValidationType::kInvalidPostAuth;
 
-    auto whitelisted = Whitelist(app).isWhitelisted(mEnvelope.signatures, getContentsHash());
+    auto whitelisted =
+        Whitelist::instance(app)->isWhitelisted(mEnvelope.signatures, getContentsHash());
 
     // if we are in applying mode fee was already deduced from signing account
     // balance, if not, we need to check if after that deduction this account
@@ -407,7 +408,7 @@ TransactionFrame::commonValid(SignatureChecker& signatureChecker,
 void
 TransactionFrame::processFeeSeqNum(LedgerDelta& delta,
                                    LedgerManager& ledgerManager,
-                                   Whitelist& whitelist)
+                                   Whitelist* whitelist)
 {
     resetSigningAccount();
     resetResults();
@@ -421,7 +422,7 @@ TransactionFrame::processFeeSeqNum(LedgerDelta& delta,
     Database& db = ledgerManager.getDatabase();
     int64_t& fee = getResult().feeCharged;
     auto whitelisted =
-        whitelist.isWhitelisted(mEnvelope.signatures, getContentsHash());
+        whitelist->isWhitelisted(mEnvelope.signatures, getContentsHash());
 
     if (fee > 0 && !whitelisted)
     {

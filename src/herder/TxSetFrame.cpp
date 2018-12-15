@@ -137,10 +137,8 @@ struct SurgeSorter
 {
     map<AccountID, double>& mAccountFeeMap;
     bool mWhitelisted;
-    std::shared_ptr<AccountID> const& mWhitelistID;
-    SurgeSorter(map<AccountID, double>& afm, bool whitelisted,
-                std::shared_ptr<AccountID> whitelistID)
-        : mAccountFeeMap(afm), mWhitelisted(whitelisted), mWhitelistID(whitelistID)
+    SurgeSorter(map<AccountID, double>& afm, bool whitelisted)
+        : mAccountFeeMap(afm), mWhitelisted(whitelisted)
     {
     }
 
@@ -150,18 +148,6 @@ struct SurgeSorter
         if (tx1->getSourceID() == tx2->getSourceID())
             return tx1->getSeqNum() < tx2->getSeqNum();
 
-        // Txs from the whitelist holder get top priority
-        if (mWhitelistID != nullptr)
-        {
-            auto wlID = *mWhitelistID.get();
-            if (tx1->getSourceID() == wlID)
-                return true;
-            else if (tx2->getSourceID() == wlID)
-                return false;
-        }
-
-        // whitelisted txs are not charged fees, so disregard them when
-		// sorting whitelisted txs
         if (mWhitelisted)
             return tx1->getSourceID() < tx2->getSourceID();
 
@@ -176,32 +162,13 @@ struct SurgeSorter
 void
 TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 {
-    /*
-	Sorting in a whitelisted world:
-	1) txs are partitioned into whitelisted and non-whitelisted lists.
-	2) whitelisted txs are sorted in a deterministic order to ensure all
-		nodes settle on the same set.
-	3) whitelisted txs are trimmed if necessary, to make room for
-		non-whitelisted txs.
-	4) non-whitelisted txs are sorted, including the fee ratio as a
-		determinant.
-	5) non-whitelisted txs are trimmed to fit in the space alloted.
-
-	If there are fewer non-whitelisted txs than space reserved, extra
-		whitelisted txs are included to fill the set.
-	Similarly, if there are fewer whitelisted txs than space allows, extra
-		non-whitelisted txs are included to fill the set.
-	*/
-
     size_t max = lm.getMaxTxSetSize();
     if (mTransactions.size() > max)
     { // surge pricing in effect!
         CLOG(WARNING, "Herder")
             << "surge pricing in effect! " << mTransactions.size();
 
-        auto whitelist = app.getWhitelist();
-
-        auto reserveCapacity = whitelist.unwhitelistedReserve(max);
+		auto reserveCapacity = Whitelist::instance(app)->unwhitelistedReserve(max);
 
         // partition by whitelisting
         std::vector<TransactionFramePtr> whitelisted;
@@ -209,15 +176,12 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 
         for (auto& tx : mTransactions)
         {
-            if (tx->isWhitelisted(app))
+            if (Whitelist::instance(app)->isWhitelisted(tx->getEnvelope().signatures,
+                                        tx->getContentsHash()))
                 whitelisted.emplace_back(tx);
             else
                 unwhitelisted.emplace_back(tx);
         }
-
-        // Adjust reserve downward if there are fewer unwhitelisted txs
-        if (unwhitelisted.size() < reserveCapacity)
-            reserveCapacity = unwhitelisted.size();
 
         // determine the fee ratio for each account
         map<AccountID, double> accountFeeMap;
@@ -233,9 +197,8 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 
         // sort whitelisted by sourceID and seqNum
         std::sort(whitelisted.begin(), whitelisted.end(),
-                  SurgeSorter(accountFeeMap, true, whitelist.accountID()));
+                  SurgeSorter(accountFeeMap, true));
 
-        // remove the over-capacity txs
         if (whitelisted.size() > (max - reserveCapacity))
             for (auto iter = whitelisted.begin() + (max - reserveCapacity);
                  iter != whitelisted.end(); iter++)
@@ -244,10 +207,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
             }
 
         // calculate available unwhitelisted capacity
-        size_t extraWhitelistCapacity =
-            whitelisted.size() > (max - reserveCapacity)
-                ? 0
-                : (max - reserveCapacity) - whitelisted.size();
+        size_t extraWhitelistCapacity = whitelisted.size() > (max - reserveCapacity) ? 0 : (max - reserveCapacity) - whitelisted.size();
         size_t totalCapacity = reserveCapacity + extraWhitelistCapacity;
 
         // exit early, if the count of unwhitelisted is within the
@@ -259,7 +219,7 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
         // remove the bottom that aren't paying enough
         std::vector<TransactionFramePtr> tempList = unwhitelisted;
         std::sort(tempList.begin(), tempList.end(),
-                  SurgeSorter(accountFeeMap, false, whitelist.accountID()));
+                  SurgeSorter(accountFeeMap, false));
 
         for (auto iter = tempList.begin() + totalCapacity;
              iter != tempList.end(); iter++)
@@ -310,7 +270,7 @@ TxSetFrame::checkOrTrim(
 
                 return false;
             }
-            totFee += tx->isWhitelisted(app) ? 0 : tx->getFee();
+            totFee += tx->getFee();
 
             lastTx = tx;
             lastSeq = tx->getSeqNum();
@@ -342,23 +302,12 @@ TxSetFrame::trimInvalid(Application& app,
 
     auto processInvalidTxLambda = [&](TransactionFramePtr tx,
                                       SequenceNumber lastSeq) {
-        CLOG(DEBUG, "Herder")
-            << "bad txSet: " << hexAbbrev(mPreviousLedgerHash) << " tx invalid"
-            << " lastSeq:" << lastSeq
-            << " tx: " << xdr::xdr_to_string(tx->getEnvelope())
-            << " result: " << tx->getResultCode();
-
         trimmed.push_back(tx);
         removeTx(tx);
         return true;
     };
     auto processInsufficientBalance =
         [&](vector<TransactionFramePtr> const& item) {
-            CLOG(DEBUG, "Herder")
-                << "bad txSet: " << hexAbbrev(mPreviousLedgerHash)
-                << " account can't pay fee"
-                << " tx:" << xdr::xdr_to_string(item.back()->getEnvelope());
-
             for (auto& tx : item)
             {
                 trimmed.push_back(tx);
