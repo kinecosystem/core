@@ -39,11 +39,12 @@ SignatureChecker::checkSignature(AccountID const& accountID,
     }
 
 	// flag any signatures from the whitelist as used
+	auto wl = Whitelist(mApp);
     for (size_t i = 0; i < mSignatures.size(); i++)
     {
         auto const& sig = mSignatures[i];
 
-        if (mApp.getWhitelist().isWhitelistSig(sig, mContentsHash))
+        if (wl.isWhitelistSig(sig, mContentsHash))
             mUsedSignatures[i] = true;
 	}
 
