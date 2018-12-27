@@ -14,7 +14,6 @@
 #include "invariant/InvariantManager.h"
 #include "ledger/LedgerDelta.h"
 #include "main/Application.h"
-#include "main/Whitelist.h"
 #include "transactions/SignatureChecker.h"
 #include "transactions/SignatureUtils.h"
 #include "util/Algoritm.h"
@@ -85,12 +84,12 @@ TransactionFrame::isWhitelisted(Application& app)
     auto counter = app.getWhitelist().getUpdateCounter();
     if (mWhitelistCounter < counter)
     {
-        mIsWhitelisted = app.getWhitelist().isWhitelisted(getEnvelope().signatures,
-                                                          getContentsHash());
+        mWhitelistPriority = app.getWhitelist().isWhitelisted(getEnvelope().signatures,
+                                                              getContentsHash());
         mWhitelistCounter = counter;
     }
 
-    return mIsWhitelisted;
+    return mWhitelistPriority != WHITELIST_PRIORITY_NONE;
 }
 
 TransactionResultPair

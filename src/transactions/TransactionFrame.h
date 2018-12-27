@@ -6,6 +6,7 @@
 
 #include "ledger/AccountFrame.h"
 #include "ledger/LedgerManager.h"
+#include "main/Whitelist.h"
 #include "overlay/StellarXDR.h"
 #include "util/types.h"
 
@@ -38,7 +39,7 @@ using TransactionFramePtr = std::shared_ptr<TransactionFrame>;
 class TransactionFrame
 {
   private:
-    bool mIsWhitelisted = false;
+    int32_t mWhitelistPriority = WHITELIST_PRIORITY_NONE;
     uint32_t mWhitelistCounter = 0;
 
   protected:
@@ -87,6 +88,10 @@ class TransactionFrame
     Hash const& getContentsHash() const;
 
     bool isWhitelisted(Application& app);
+    int32_t whitelistPriority()
+    {
+        return mWhitelistPriority;
+    }
 
     std::vector<std::shared_ptr<OperationFrame>> const&
     getOperations() const

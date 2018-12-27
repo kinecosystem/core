@@ -161,11 +161,18 @@ struct SurgeSorter
                 return false;
         }
 
-        // whitelisted txs are not charged fees, so disregard them when
-		// sorting whitelisted txs
-        if (mWhitelisted)
-            return tx1->getSourceID() < tx2->getSourceID();
+        // sort whitelisted txs by their relative priority
+        if (mWhitelisted) {
+            auto tx1Priority = tx1->whitelistPriority();
+            auto tx2Priority = tx2->whitelistPriority();
 
+            if (tx1Priority == tx2Priority)
+                return tx1->getSourceID() < tx2->getSourceID();
+
+            return tx1Priority > tx2Priority;
+        }
+
+        // sort non-whitelisted txs by their relative fees
         double fee1 = mAccountFeeMap[tx1->getSourceID()];
         double fee2 = mAccountFeeMap[tx2->getSourceID()];
         if (fee1 == fee2)
