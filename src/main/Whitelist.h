@@ -23,9 +23,9 @@ class Whitelist : public ManagedDataCache
 
     size_t unwhitelistedReserve(size_t setSize);
 
-    int32_t isWhitelisted(std::vector<DecoratedSignature> signatures,
-                           Hash const& txHash);
-    int32_t isWhitelistSig(DecoratedSignature const& sig, Hash const& txHash);
+    int32_t priority(std::vector<DecoratedSignature> signatures,
+                     Hash const& txHash);
+    int32_t signerPriority(DecoratedSignature const& sig, Hash const& txHash);
 
     virtual std::string getAccount() override;
 
