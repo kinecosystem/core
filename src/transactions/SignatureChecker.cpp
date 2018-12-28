@@ -45,7 +45,8 @@ SignatureChecker::checkSignature(AccountID const& accountID,
     {
         auto const& sig = mSignatures[i];
 
-        if (mApp.getWhitelist().isWhitelistSig(sig, mContentsHash))
+        auto p = mApp.getWhitelist().signerPriority(sig, mContentsHash);
+        if (p != WHITELIST_PRIORITY_NONE)
             mUsedSignatures[i] = true;
 	}
 

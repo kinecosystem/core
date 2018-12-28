@@ -84,8 +84,9 @@ TransactionFrame::isWhitelisted(Application& app)
     auto counter = app.getWhitelist().getUpdateCounter();
     if (mWhitelistCounter < counter)
     {
-        mWhitelistPriority = app.getWhitelist().isWhitelisted(getEnvelope().signatures,
-                                                              getContentsHash());
+        mWhitelistPriority =
+            app.getWhitelist().priority(getEnvelope().signatures,
+                                        getContentsHash());
         mWhitelistCounter = counter;
     }
 
