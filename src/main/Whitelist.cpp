@@ -71,23 +71,25 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
                 continue;
             }
 
-            auto hint = intVal;
-
             try
             {
                 // An exception is thrown if the key isn't convertible.
                 // The entry is then skipped.
                 KeyUtils::fromStrKey<PublicKey>(name);
-
-                std::vector<WhitelistEntry> keys = whitelist[hint];
-                keys.emplace_back(WhitelistEntry({name, priority}));
-                whitelist[hint] = keys;
             }
             catch (...)
             {
                 CLOG(INFO, "Whitelist")
                     << "bad public key: " << name;
+
+                continue;
             }
+
+            auto hint = intVal;
+
+            std::vector<WhitelistEntry> keys = whitelist[hint];
+            keys.emplace_back(WhitelistEntry({name, priority}));
+            whitelist[hint] = keys;
         }
 }
 
