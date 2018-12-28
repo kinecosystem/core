@@ -336,17 +336,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("base reserve")
     {
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWLBase.getPublicKey().ed25519());
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWLBase.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWLBase);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -382,17 +372,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("whitelist")
     {
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -424,17 +404,7 @@ TEST_CASE("whitelist", "[herder]")
         REQUIRE(!tx2->isWhitelisted(*app));
         REQUIRE(tx3->isWhitelisted(*app));
 
-        DataValue value1;
-        value1.resize(4);
-        SignatureHint hint1 =
-            SignatureUtils::getHint(accountWL2.getPublicKey().ed25519());
-        for (int n = 0; n < 4; n++)
-        {
-            value1[n] = (unsigned char)hint1[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL2.getPublicKey()),
-                             &value1);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL2);
 
         closeLedgerOn(*app, 3, 4, 11, 2018, txSet->mTransactions);
 
@@ -457,20 +427,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("whitelist default set size")
     {
-
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 20;
-
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -512,20 +469,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("whitelist with 0 fee")
     {
-
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 20;
-
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -568,19 +512,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("non whitelist with 0 fee")
     {
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 20;
-
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -623,20 +555,10 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("whitelist different set size")
     {
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
+
         app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 19;
-
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
-
+        
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
         txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
@@ -676,17 +598,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("equal number of whitelisted and non whitelisted")
     {
-
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint = SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -728,17 +640,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("all whitelisted")
     {
-
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint = SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -774,19 +676,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("non whitelist pays more fee")
     {
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 20;
-
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -833,19 +723,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("fees sorting check for non whitelisted accounts")
     {
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 20;
-
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -904,19 +782,7 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("whitelisted only")
     {
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 20;
-
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
@@ -961,29 +827,9 @@ TEST_CASE("whitelist", "[herder]")
 
     SECTION("fees sorting check for whitelisted accounts")
     {
-        DataValue value;
-        value.resize(4);
-        SignatureHint hint =
-            SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
-        for (int n = 0; n < 4; n++)
-        {
-            value[n] = (unsigned char)hint[n];
-        }
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
-        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()),
-                             &value);
-
-        DataValue value1;
-        value1.resize(4);
-        SignatureHint hint1 =
-            SignatureUtils::getHint(accountWL2.getPublicKey().ed25519());
-        for (int n = 0; n < 4; n++)
-        {
-            value1[n] = (unsigned char)hint1[n];
-        }
-
-        whitelist.manageData(KeyUtils::toStrKey(accountWL2.getPublicKey()),
-                             &value1);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL2);
 
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 

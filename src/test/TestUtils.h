@@ -9,6 +9,7 @@
 #include "invariant/InvariantManagerImpl.h"
 #include "ledger/LedgerManagerImpl.h"
 #include "main/ApplicationImpl.h"
+#include "test/TestAccount.h"
 #include <type_traits>
 
 namespace stellar
@@ -23,6 +24,12 @@ void crankSome(VirtualClock& clock);
 void injectSendPeersAndReschedule(VirtualClock::time_point& end,
                                   VirtualClock& clock, VirtualTimer& timer,
                                   LoopbackPeerConnection& connection);
+
+void addWhitelistEntry(Application::pointer app,
+                       TxSetFramePtr txSet,
+                       TestAccount whitelist,
+                       TestAccount account,
+                       int32_t priority = 0x7fffffff);
 
 class BucketListDepthModifier
 {
