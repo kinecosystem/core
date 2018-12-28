@@ -4,6 +4,7 @@
 
 #include "TestUtils.h"
 #include "overlay/LoopbackPeer.h"
+#include "transactions/SignatureUtils.h"
 #include "util/make_unique.h"
 
 namespace stellar
@@ -45,6 +46,31 @@ injectSendPeersAndReschedule(VirtualClock::time_point& end, VirtualClock& clock,
             }
         });
     }
+}
+
+void
+addWhitelistEntry(Application::pointer app,
+                  TxSetFramePtr txSet,
+                  TestAccount whitelist,
+                  TestAccount account,
+                  int32_t priority) {
+    DataValue value;
+    value.resize(priority == 0x7fffffff ? 4 : 8); // the default value is not recorded
+    SignatureHint hint =
+        SignatureUtils::getHint(account.getPublicKey().ed25519());
+    for (int n = 0; n < 4; n++)
+    {
+        value[n] = (unsigned char)hint[n];
+    }
+
+    int32_t bePriority = htonl(priority);
+    for (int n = 0; n < 4; n++)
+    {
+        value[n + 4] = ((unsigned char*)&bePriority)[n];
+    }
+
+    whitelist.manageData(KeyUtils::toStrKey(account.getPublicKey()),
+                         &value);
 }
 
 BucketListDepthModifier::BucketListDepthModifier(uint32_t newDepth)
