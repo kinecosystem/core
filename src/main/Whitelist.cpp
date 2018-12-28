@@ -22,7 +22,7 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
      whitelist.clear();
 
 	 // Iterate DataFrames to build the whitelist.
-	 // Structure: hash of (hint, vector of public key)
+	 // Structure: hash of (hint, vector of WhitelistEntry)
 	 // The hint is the last 4 bytes of the public key, and is used to
 	 // efficiently filter the possible entries for a given signature.
      for (auto& df : dfs)
@@ -40,7 +40,7 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
                 continue;
             }
 
-            // The first integer stored in value will be either the reserve,
+            // The first integer stored in value will be either the reserve
             // or the signature hint.
             int32_t intVal, priority;
 
@@ -74,7 +74,7 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
             try
             {
                 // An exception is thrown if the key isn't convertible.
-                // The entry is then skipped.
+                // If this occurs, the entry is skipped.
                 KeyUtils::fromStrKey<PublicKey>(name);
             }
             catch (...)
@@ -122,8 +122,8 @@ Whitelist::priority(std::vector<DecoratedSignature> signatures,
     return WHITELIST_PRIORITY_NONE;
 }
 
-// Returns the priority of the whitelist key, if one was the signer.
-// Returns WHITELIST_PRIORITY_NONE if no such entry is found.
+// Returns the priority of the signer, if any.
+// Returns WHITELIST_PRIORITY_NONE if the signer isn't on the whitelist.
 int32_t
 Whitelist::signerPriority(DecoratedSignature const& sig, Hash const& txHash)
 {
