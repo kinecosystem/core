@@ -558,7 +558,7 @@ TEST_CASE("whitelist", "[herder]")
         stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
 
         app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 19;
-        
+
         closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
 
         txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
@@ -889,6 +889,66 @@ TEST_CASE("whitelist", "[herder]")
         closeLedgerOn(*app, 3, 4, 11, 2018, txSet->mTransactions);
         REQUIRE(accountWL2.getBalance() + wlAmount == wl2Balance);
         REQUIRE(accountWL.getBalance() == wlBalance);
+    }
+
+    SECTION("priority: default priority")
+    {
+        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 1;
+
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL, 1000);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL2);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
+        txSet->add(accountWL.tx({payment(destAccount, 1)}));
+        txSet->add(accountWL2.tx({payment(destAccount, 1)}));
+
+        txSet->surgePricingFilter(lm, *app);
+
+        REQUIRE(txSet->mTransactions[0]->whitelistPriority() != 1000);
+        REQUIRE(txSet->mTransactions[0]->getSourceID() == accountWL2.getPublicKey());
+    }
+
+    SECTION("priority: default priority (reversed)")
+    {
+        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 1;
+
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL2, 1000);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
+        txSet->add(accountWL.tx({payment(destAccount, 1)}));
+        txSet->add(accountWL2.tx({payment(destAccount, 1)}));
+
+        txSet->surgePricingFilter(lm, *app);
+
+        REQUIRE(txSet->mTransactions[0]->whitelistPriority() != 1000);
+        REQUIRE(txSet->mTransactions[0]->getSourceID() == accountWL.getPublicKey());
+    }
+
+    SECTION("priority: non-default priority")
+    {
+        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 1;
+
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL, 2000);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL2, 1000);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
+        txSet->add(accountWL.tx({payment(destAccount, 1)}));
+        txSet->add(accountWL2.tx({payment(destAccount, 1)}));
+
+        txSet->surgePricingFilter(lm, *app);
+
+        REQUIRE(txSet->mTransactions[0]->whitelistPriority() != 1000);
+        REQUIRE(txSet->mTransactions[0]->getSourceID() == accountWL.getPublicKey());
     }
 }
 
