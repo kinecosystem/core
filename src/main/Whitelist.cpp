@@ -40,17 +40,23 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
                 continue;
             }
 
-            // The first integer stored in value will be either the reserve, or the signature hint.
+            // The first integer stored in value will be either the reserve,
+            // or the signature hint.
             int32_t intVal, priority;
 
-            intVal = (value[0] << 24) + (value[1] << 16) + (value[2] << 8) + value[3];
+            intVal =
+                (value[0] << 24) + (value[1] << 16) +
+                (value[2] << 8) + value[3];
 
             if (value.size() == 8)
-                priority = (value[4] << 24) + (value[5] << 16) + (value[6] << 8) + value[7];
+                priority =
+                    (value[4] << 24) + (value[5] << 16) +
+                    (value[6] << 8) + value[7];
             else
                 priority = WHITELIST_PRIORITY_MAX;
 
-			// The DataFrame entry is the percentage to reserve for non-whitelisted txs.
+			// The DataFrame entry is the percentage to reserve for
+            // non-whitelisted txs.
 			// Store the value and continue.
             if (name == "reserve")
             {
@@ -69,7 +75,8 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
 
             try
             {
-                // An exception is thrown if the key isn't convertible.  The entry is then skipped.
+                // An exception is thrown if the key isn't convertible.
+                // The entry is then skipped.
                 KeyUtils::fromStrKey<PublicKey>(name);
 
                 std::vector<WhitelistEntry> keys = whitelist[hint];
