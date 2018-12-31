@@ -29,7 +29,7 @@ void addWhitelistEntry(Application::pointer app,
                        TxSetFramePtr txSet,
                        TestAccount whitelist,
                        TestAccount account,
-                       int32_t priority = 0x7fffffff);
+                       int32_t priority = WHITELIST_PRIORITY_MAX);
 
 class BucketListDepthModifier
 {
