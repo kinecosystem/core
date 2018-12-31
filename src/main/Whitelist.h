@@ -6,6 +6,7 @@
 
 namespace stellar
 {
+extern const int32_t WHITELIST_PRIORITY_MAX;
 extern const int32_t WHITELIST_PRIORITY_NONE;
 
 typedef struct {

@@ -55,9 +55,13 @@ addWhitelistEntry(Application::pointer app,
                   TestAccount account,
                   int32_t priority) {
     DataValue value;
-    value.resize(priority == 0x7fffffff ? 4 : 8); // the default value is not recorded
+
+     // the default value is not recorded
+    value.resize(priority == WHITELIST_PRIORITY_MAX ? 4 : 8);
+
     SignatureHint hint =
         SignatureUtils::getHint(account.getPublicKey().ed25519());
+    
     for (int n = 0; n < 4; n++)
     {
         value[n] = (unsigned char)hint[n];
