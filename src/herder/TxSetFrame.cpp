@@ -13,6 +13,7 @@
 #include "util/Logging.h"
 #include "xdrpp/marshal.h"
 #include <algorithm>
+#include <numeric>
 
 #include "xdrpp/printer.h"
 
@@ -181,6 +182,106 @@ struct SurgeSorter
     }
 };
 
+std::vector<std::vector<TransactionFramePtr>>
+distribute(std::vector<std::vector<TransactionFramePtr>> txs,
+           std::vector<size_t> distribution)
+{
+    int max = std::accumulate(distribution.begin(), distribution.end(), 0);
+
+    std::vector<std::vector<TransactionFramePtr>> allocation;
+    allocation.resize(txs.size());
+
+    int unallocatedPercentage = 0;
+    int allocated = 0;
+
+    // Initial allocation, based on the ideal distribution.
+    for (int i = 0; i < txs.size(); i++)
+    {
+        auto txAllocation = std::min(txs[i].size(), (size_t)distribution[i]);
+
+        unallocatedPercentage +=
+            txs[i].size() - txAllocation > 0 ? distribution[i] : 0;
+
+        std::vector<TransactionFramePtr> sub(txs[i].begin(),
+                                             txs[i].begin() + txAllocation);
+        allocation[i] = sub;
+
+        allocated += txAllocation;
+    }
+
+    auto remainder = max - allocated;
+    auto previous = 0;
+
+    // Allocate the remainder, calculating the percentage across all priorities
+    // which still had txs remaining after the initial distribution.
+    // Loop while the remainder changes.  (Eventually the integer calculation
+    // truncates to zero, and nothing more is allocated.)
+    while (previous != remainder)
+    {
+        for (int i = 0; i < txs.size(); i++)
+        {
+            auto percentage = distribution[i] * 100 / unallocatedPercentage;
+            auto txMax = percentage * remainder / 100;
+            auto txAllocation =
+                std::min((size_t)txMax, txs[i].size() - allocation[i].size());
+
+            if (allocation[i].size() < txs[i].size())
+            {
+                auto first = txs[i].begin() + allocation[i].size();
+                auto last = first + txAllocation;
+                std::vector<TransactionFramePtr> sub(first, last);
+
+                allocation[i].insert(std::end(allocation[i]),
+                                     std::begin(sub), std::end(sub));
+
+                allocated += txAllocation;
+            }
+        }
+
+        remainder = max - allocated;
+        previous = (previous != remainder) ? remainder : previous;
+    }
+
+    auto sum = [](int a, std::vector<TransactionFramePtr> b)
+    {
+        return a + b.size();
+    };
+
+    // Fill remaining capacity through round-robin allocation.
+    int i = 0;
+    auto txCount = std::accumulate(txs.begin(), txs.end(), 0, sum);
+    while (allocated < max && allocated < txCount)
+    {
+        if (allocation[i].size() < txs[i].size())
+        {
+            allocation[i].emplace_back(txs[i][allocation[i].size()]);
+            allocated++;
+        }
+
+        i++;
+        i %= allocation.size();
+    }
+
+    return allocation;
+}
+
+std::vector<std::vector<TransactionFramePtr>>
+groupTxs(std::vector<TransactionFramePtr> t, std::vector<int32_t> priorities) {
+    std::unordered_map<int32_t, std::vector<TransactionFramePtr>> m;
+    for (auto tx: t) {
+        auto v = m[tx->whitelistPriority()];
+        v.emplace_back(tx);
+        m[tx->whitelistPriority()] = v;
+    }
+
+    std::vector<std::vector<TransactionFramePtr>> txs;
+
+    for (int i = 0; i < priorities.size(); i++)
+        txs.emplace_back(m[priorities[i]]);
+
+    return txs;
+}
+
 void
 TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 {
@@ -243,19 +344,25 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
         std::sort(whitelisted.begin(), whitelisted.end(),
                   SurgeSorter(accountFeeMap, true, whitelist.accountID()));
 
+        auto wlCapacity = max - reserveCapacity;
+
+        auto groupedTxs = groupTxs(whitelisted, whitelist.priorities());
+        auto distribution = distribute(groupedTxs,
+                                       whitelist.distribution(wlCapacity));
+
         // remove the over-capacity txs
-        if (whitelisted.size() > (max - reserveCapacity))
-            for (auto iter = whitelisted.begin() + (max - reserveCapacity);
-                 iter != whitelisted.end(); iter++)
-            {
-                removeTx(*iter);
-            }
+        if (whitelisted.size() > wlCapacity)
+            for (int i = 0; i < groupedTxs.size(); i++)
+                for (auto iter = groupedTxs[i].begin() + distribution[i].size();
+                     iter != groupedTxs[i].end(); iter++)
+                {
+                    removeTx(*iter);
+                }
 
         // calculate available unwhitelisted capacity
-        size_t extraWhitelistCapacity =
-            whitelisted.size() > (max - reserveCapacity)
+        size_t extraWhitelistCapacity = whitelisted.size() > wlCapacity
                 ? 0
-                : (max - reserveCapacity) - whitelisted.size();
+                : wlCapacity - whitelisted.size();
         size_t totalCapacity = reserveCapacity + extraWhitelistCapacity;
 
         // exit early, if the count of unwhitelisted is within the

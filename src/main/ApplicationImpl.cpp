@@ -720,7 +720,6 @@ Whitelist&
 ApplicationImpl::getWhitelist()
 {
     mWhitelist.get()->update();
-    mWhitelist.get()->refreshDistribution();
     return *mWhitelist;
 }
 

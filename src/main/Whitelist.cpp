@@ -16,26 +16,50 @@ const int32_t WHITELIST_PRIORITY_NONE = 0;
 // Available whitelisted capacity is split by whitelist priority.
 // Higher priorities receive a proportionally-larger percentage of
 // available capacity.
-std::vector<size_t>
-fairDistribution(size_t capacity, size_t slices)
+std::vector<size_t> fairDistribution(size_t capacity,
+                                     const size_t slices,
+                                     size_t floor,
+                                     const int ratio)
 {
-    const int ratio = 50;
-    size_t distributed = 0;
-    std::vector<size_t> distribution = {};
+    auto original = capacity;
+    size_t allocated = 0;
+    std::vector<size_t> allocations = {};
 
-    distribution.resize(slices);
+    floor = floor > capacity ? 1 : floor;
+    
+    allocations.resize(slices);
 
-    for (int i = 0; i < slices; i++) {
-        auto allocation = (capacity - distributed) * ratio / 100;
-        distributed += allocation;
-        distribution[i] = allocation;
+    /*
+     This should never happen.  This will trigger when the available
+     capacity is lower than the number of priorities.
+
+     This will happen if the maxtxsetsize is too low, or if the reserve for
+     non-whitelisted txs is too high.
+    */
+    if (capacity < slices)
+    {
+        allocations[0] = std::max(capacity, (size_t)1);
+
+        return allocations;
     }
 
-    distribution[0] += capacity - std::accumulate(distribution.begin(),
-                                                  distribution.end(),
-                                                  0);
+    for (int i = 0; i < slices; i++) {
+        allocations[i] = floor;
+        capacity -= floor;
+    }
 
-    return distribution;
+    for (int i = 0; i < slices; i++) {
+        auto allocation = (capacity - allocated) * ratio / 100;
+        allocated += allocation;
+        allocations[i] += allocation;
+    }
+
+    allocations[0] += std::max(size_t(0),
+                               original - std::accumulate(allocations.begin(),
+                                                          allocations.end(),
+                                                          0));
+
+    return allocations;
 }
 
 std::string
@@ -78,9 +102,8 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
             (value[2] << 8) + value[3];
 
         if (value.size() == 8)
-            priority =
-            (value[4] << 24) + (value[5] << 16) +
-            (value[6] << 8) + value[7];
+            priority = (value[4] << 24) + (value[5] << 16) +
+                (value[6] << 8) + value[7];
         else
             priority = WHITELIST_PRIORITY_MAX;
 
@@ -98,7 +121,7 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
             reserve = std::max(1, reserve);
             reserve = std::min(100, reserve);
 
-            mReserve = (double)reserve / 100;
+            mReserve = reserve;
 
             continue;
         }
@@ -126,37 +149,10 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
 
     mPriorities.clear();
 
-    if (prioritySet.size() == 0)
-    {
-        mDistribution.clear();
-
-        return;
-    }
-
     // Sort priorities in descending order.
     mPriorities.insert(mPriorities.end(),
                        prioritySet.begin(), prioritySet.end());
     std::sort(mPriorities.begin(), mPriorities.end(), std::greater<int32_t>());
-
-    // Refresh the distribution.
-    auto capacity = mApp.getLedgerManager().getMaxTxSetSize();
-    mDistribution = fairDistribution(capacity - unwhitelistedReserve(capacity),
-                                     mPriorities.size());
-
-    mTxSetSize = capacity;
-}
-
-void
-Whitelist::refreshDistribution()
-{
-    auto current = mApp.getLedgerManager().getMaxTxSetSize();
-    if (mTxSetSize == current || mPriorities.size() == 0)
-        return;
-
-    mDistribution = fairDistribution(current - unwhitelistedReserve(current),
-                                     mPriorities.size());
-
-    mTxSetSize = current;
 }
 
 // Translate the reserve percentage into the number of entries to reserve,
@@ -164,12 +160,8 @@ Whitelist::refreshDistribution()
 size_t
 Whitelist::unwhitelistedReserve(size_t setSize)
 {
-    size_t reserve = size_t(std::trunc(mReserve * setSize)); 
-	
 	// reserve at least 1 entry for non-whitelisted txs
-	reserve = std::max((size_t)1, reserve);
-
-	return reserve;
+	return std::max((size_t)1, setSize * mReserve / 100);
 }
 
 // Determine if a tx is whitelisted.  This is done by checking each
