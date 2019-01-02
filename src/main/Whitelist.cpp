@@ -4,12 +4,39 @@
 #include "transactions/TransactionFrame.h"
 #include "util/Logging.h"
 #include <stdint.h>
+#include <numeric>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace stellar
 {
 const int32_t WHITELIST_PRIORITY_MAX = 0x7fffffff; // MAX of int32_t
 const int32_t WHITELIST_PRIORITY_NONE = 0;
+
+// Available whitelisted capacity is split by whitelist priority.
+// Higher priorities receive a proportionally-larger percentage of
+// available capacity.
+std::vector<size_t>
+fairDistribution(size_t capacity, size_t slices)
+{
+    const int ratio = 50;
+    size_t distributed = 0;
+    std::vector<size_t> distribution = {};
+
+    distribution.resize(slices);
+
+    for (int i = 0; i < slices; i++) {
+        auto allocation = (capacity - distributed) * ratio / 100;
+        distributed += allocation;
+        distribution[i] = allocation;
+    }
+
+    distribution[0] += capacity - std::accumulate(distribution.begin(),
+                                                  distribution.end(),
+                                                  0);
+
+    return distribution;
+}
 
 std::string
 Whitelist::getAccount()
@@ -19,6 +46,8 @@ Whitelist::getAccount()
 
 void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
 {
+    std::unordered_set<int32_t> prioritySet;
+
     whitelist.clear();
 
     // Iterate DataFrames to build the whitelist.
@@ -54,6 +83,9 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
             (value[6] << 8) + value[7];
         else
             priority = WHITELIST_PRIORITY_MAX;
+
+        // Collect the distinct set of priorities.
+        prioritySet.insert(priority);
 
         // The DataFrame entry is the percentage to reserve for
         // non-whitelisted txs.
@@ -91,6 +123,40 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
         keys.emplace_back(WhitelistEntry({name, priority}));
         whitelist[hint] = keys;
     }
+
+    mPriorities.clear();
+
+    if (prioritySet.size() == 0)
+    {
+        mDistribution.clear();
+
+        return;
+    }
+
+    // Sort priorities in descending order.
+    mPriorities.insert(mPriorities.end(),
+                       prioritySet.begin(), prioritySet.end());
+    std::sort(mPriorities.begin(), mPriorities.end(), std::greater<int32_t>());
+
+    // Refresh the distribution.
+    auto capacity = mApp.getLedgerManager().getMaxTxSetSize();
+    mDistribution = fairDistribution(capacity - unwhitelistedReserve(capacity),
+                                     mPriorities.size());
+
+    mTxSetSize = capacity;
+}
+
+void
+Whitelist::refreshDistribution()
+{
+    auto current = mApp.getLedgerManager().getMaxTxSetSize();
+    if (mTxSetSize == current || mPriorities.size() == 0)
+        return;
+
+    mDistribution = fairDistribution(current - unwhitelistedReserve(current),
+                                     mPriorities.size());
+
+    mTxSetSize = current;
 }
 
 // Translate the reserve percentage into the number of entries to reserve,
