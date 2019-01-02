@@ -19,78 +19,78 @@ Whitelist::getAccount()
 
 void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
 {
-     whitelist.clear();
+    whitelist.clear();
 
-	 // Iterate DataFrames to build the whitelist.
-	 // Structure: hash of (hint, vector of WhitelistEntry)
-	 // The hint is the last 4 bytes of the public key, and is used to
-	 // efficiently filter the possible entries for a given signature.
-     for (auto& df : dfs)
+    // Iterate DataFrames to build the whitelist.
+    // Structure: hash of (hint, vector of WhitelistEntry)
+    // The hint is the last 4 bytes of the public key, and is used to
+    // efficiently filter the possible entries for a given signature.
+    for (auto& df : dfs)
+    {
+        auto data = df->getData();
+        auto name = data.dataName;
+        auto value = data.dataValue;
+
+        // If the value isn't 4 or 8 bytes long, skip the entry.
+        if (value.size() != 4 && value.size() != 8)
         {
-            auto data = df->getData();
-            auto name = data.dataName;
-            auto value = data.dataValue;
+            CLOG(INFO, "Whitelist")
+            << "bad value for: " << name;
 
-            // If the value isn't 4 or 8 bytes long, skip the entry.
-            if (value.size() != 4 && value.size() != 8)
-            {
-                CLOG(INFO, "Whitelist")
-                    << "bad value for: " << name;
-
-                continue;
-            }
-
-            // The first integer stored in value will be either the reserve
-            // or the signature hint.
-            int32_t intVal, priority;
-
-            intVal =
-                (value[0] << 24) + (value[1] << 16) +
-                (value[2] << 8) + value[3];
-
-            if (value.size() == 8)
-                priority =
-                    (value[4] << 24) + (value[5] << 16) +
-                    (value[6] << 8) + value[7];
-            else
-                priority = WHITELIST_PRIORITY_MAX;
-
-			// The DataFrame entry is the percentage to reserve for
-            // non-whitelisted txs.
-			// Store the value and continue.
-            if (name == "reserve")
-            {
-                auto reserve = intVal;
-
-				// clamp the value between 1 and 100.
-                reserve = std::max(1, reserve);
-                reserve = std::min(100, reserve);
-
-                mReserve = (double)reserve / 100;
-
-                continue;
-            }
-
-            try
-            {
-                // An exception is thrown if the key isn't convertible.
-                // If this occurs, the entry is skipped.
-                KeyUtils::fromStrKey<PublicKey>(name);
-            }
-            catch (...)
-            {
-                CLOG(INFO, "Whitelist")
-                    << "bad public key: " << name;
-
-                continue;
-            }
-
-            auto hint = intVal;
-
-            std::vector<WhitelistEntry> keys = whitelist[hint];
-            keys.emplace_back(WhitelistEntry({name, priority}));
-            whitelist[hint] = keys;
+            continue;
         }
+
+        // The first integer stored in value will be either the reserve
+        // or the signature hint.
+        int32_t intVal, priority;
+
+        intVal =
+            (value[0] << 24) + (value[1] << 16) +
+            (value[2] << 8) + value[3];
+
+        if (value.size() == 8)
+            priority =
+            (value[4] << 24) + (value[5] << 16) +
+            (value[6] << 8) + value[7];
+        else
+            priority = WHITELIST_PRIORITY_MAX;
+
+        // The DataFrame entry is the percentage to reserve for
+        // non-whitelisted txs.
+        // Store the value and continue.
+        if (name == "reserve")
+        {
+            auto reserve = intVal;
+
+            // clamp the value between 1 and 100.
+            reserve = std::max(1, reserve);
+            reserve = std::min(100, reserve);
+
+            mReserve = (double)reserve / 100;
+
+            continue;
+        }
+
+        try
+        {
+            // An exception is thrown if the key isn't convertible.
+            // If this occurs, the entry is skipped.
+            KeyUtils::fromStrKey<PublicKey>(name);
+        }
+        catch (...)
+        {
+            CLOG(INFO, "Whitelist")
+            << "bad public key: " << name;
+
+            continue;
+        }
+
+        auto hint = intVal;
+
+        auto keys = whitelist[hint];
+        keys.emplace_back(WhitelistEntry({name, priority}));
+        whitelist[hint] = keys;
+    }
 }
 
 // Translate the reserve percentage into the number of entries to reserve,
