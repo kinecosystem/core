@@ -14,6 +14,11 @@ typedef struct {
     int32_t priority;
 } WhitelistEntry;
 
+std::vector<size_t>
+    fairDistribution(size_t capacity,
+                     const size_t slices,
+                     const size_t floor = 1,
+                     const int ratio = 40);
 
 class Whitelist : public ManagedDataCache
 {
@@ -22,15 +27,19 @@ class Whitelist : public ManagedDataCache
     {
     }
 
-    void refreshDistribution();
-
     std::vector<int32_t> priorities()
     {
         return mPriorities;
     }
 
-    std::vector<size_t> distribution() {
-        return mDistribution;
+    std::vector<size_t> distribution(size_t capacity)
+    {
+        auto count = mPriorities.size();
+        auto floor = unwhitelistedReserve(capacity) + 1;
+
+        return count > 0 ? fairDistribution(capacity,
+                                            count,
+                                            floor) : std::vector<size_t>();
     }
 
     size_t unwhitelistedReserve(size_t setSize);
@@ -46,11 +55,8 @@ class Whitelist : public ManagedDataCache
   private:
     std::unordered_map<uint32_t, std::vector<WhitelistEntry>> whitelist;
     std::vector<int32_t> mPriorities;
-    std::vector<size_t> mDistribution;
 
 	// default to a 5% reserve
-	double mReserve = 0.05;
-
-    size_t mTxSetSize = 0;
+	size_t mReserve = 5;
 };
 } // namespace stellar
