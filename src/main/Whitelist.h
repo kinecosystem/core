@@ -22,6 +22,17 @@ class Whitelist : public ManagedDataCache
     {
     }
 
+    void refreshDistribution();
+
+    std::vector<int32_t> priorities()
+    {
+        return mPriorities;
+    }
+
+    std::vector<size_t> distribution() {
+        return mDistribution;
+    }
+
     size_t unwhitelistedReserve(size_t setSize);
 
     int32_t priority(std::vector<DecoratedSignature> signatures,
@@ -34,8 +45,12 @@ class Whitelist : public ManagedDataCache
 
   private:
     std::unordered_map<uint32_t, std::vector<WhitelistEntry>> whitelist;
+    std::vector<int32_t> mPriorities;
+    std::vector<size_t> mDistribution;
 
 	// default to a 5% reserve
 	double mReserve = 0.05;
+
+    size_t mTxSetSize = 0;
 };
 } // namespace stellar
