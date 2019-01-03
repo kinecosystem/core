@@ -950,6 +950,152 @@ TEST_CASE("whitelist", "[herder]")
         REQUIRE(txSet->mTransactions[0]->whitelistPriority() != 1000);
         REQUIRE(txSet->mTransactions[0]->getSourceID() == accountWL.getPublicKey());
     }
+
+    SECTION("priority: distribution decreases by priority")
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            std::string seed = "account";
+            seed += i;
+            auto account = root.create(seed, 5000000000);
+
+            stellar::testutil::addWhitelistEntry(app, txSet,
+                                                 whitelist,
+                                                 account, 1000 * (i + 1));
+
+            closeLedgerOn(*app, 2 + i, 1 + i, 11, 2018, txSet->mTransactions);
+
+            auto distribution = app->getWhitelist().distribution(500);
+            auto priorities = app->getWhitelist().priorities();
+
+            for (int j = 1; j < distribution.size(); j++)
+            {
+                REQUIRE(distribution[j] <= distribution[j - 1]);
+                REQUIRE(priorities[j] < priorities[j - 1]);
+            }
+        }
+    }
+
+    SECTION("priority: filtering - ideal distribution ")
+    {
+        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 500;
+
+        std::vector<TestAccount> accounts;
+        for (int i = 0; i < 10; i++)
+        {
+            std::string seed = "account";
+            seed += i;
+            auto account = root.create(seed, 5000000000);
+
+            stellar::testutil::addWhitelistEntry(app, txSet,
+                                                 whitelist,
+                                                 account, 1000 * (i + 1));
+
+            accounts.emplace_back(account);
+        }
+
+        closeLedgerOn(*app, 2, 1, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
+        auto distribution = app->getWhitelist().distribution(500);
+        auto priorities = app->getWhitelist().priorities();
+
+        for (int i = 0; i < accounts.size(); i++)
+            for (int j = 0; j < 500; j++)
+                txSet->add(accounts[i].tx({payment(destAccount, 1)}));
+
+        txSet->surgePricingFilter(lm, *app);
+
+        std::unordered_map<int32_t, int> counts;
+        for (auto tx: txSet->mTransactions)
+            counts[tx->whitelistPriority()]++;
+
+        for (int i = 0; i < priorities.size(); i++)
+            REQUIRE(counts[priorities[i]] == distribution[i]);
+    }
+
+    SECTION("priority: filtering - unused priority - highest")
+    {
+        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 500;
+
+        std::vector<TestAccount> accounts;
+        for (int i = 0; i < 10; i++)
+        {
+            std::string seed = "account";
+            seed += i;
+            auto account = root.create(seed, 5000000000);
+
+            stellar::testutil::addWhitelistEntry(app, txSet,
+                                                 whitelist,
+                                                 account, 1000 * (i + 1));
+
+            accounts.emplace_back(account);
+        }
+
+        closeLedgerOn(*app, 2, 1, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
+        auto distribution = app->getWhitelist().distribution(500);
+        auto priorities = app->getWhitelist().priorities();
+
+        for (int i = 0; i < accounts.size() - 1; i++)
+            for (int j = 0; j < 500; j++)
+                txSet->add(accounts[i].tx({payment(destAccount, 1)}));
+
+        txSet->surgePricingFilter(lm, *app);
+
+        std::unordered_map<int32_t, int> counts;
+        for (auto tx: txSet->mTransactions)
+            counts[tx->whitelistPriority()]++;
+
+        for (int i = 1; i < priorities.size(); i++)
+            REQUIRE(counts[priorities[i]] > distribution[i]);
+
+        REQUIRE(txSet->mTransactions.size() == 500);
+    }
+
+    SECTION("priority: filtering - unused priority - lowest")
+    {
+        app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 500;
+
+        std::vector<TestAccount> accounts;
+        for (int i = 0; i < 10; i++)
+        {
+            std::string seed = "account";
+            seed += i;
+            auto account = root.create(seed, 5000000000);
+
+            stellar::testutil::addWhitelistEntry(app, txSet,
+                                                 whitelist,
+                                                 account, 1000 * (i + 1));
+
+            accounts.emplace_back(account);
+        }
+
+        closeLedgerOn(*app, 2, 1, 11, 2018, txSet->mTransactions);
+
+        txSet = std::make_shared<TxSetFrame>(app->getLedgerManager().getLastClosedLedgerHeader().hash);
+
+        auto distribution = app->getWhitelist().distribution(500);
+        auto priorities = app->getWhitelist().priorities();
+
+        for (int i = 1; i < accounts.size(); i++)
+            for (int j = 0; j < 500; j++)
+                txSet->add(accounts[i].tx({payment(destAccount, 1)}));
+
+        txSet->surgePricingFilter(lm, *app);
+
+        std::unordered_map<int32_t, int> counts;
+        for (auto tx: txSet->mTransactions)
+            counts[tx->whitelistPriority()]++;
+
+        for (int i = 0; i < priorities.size() - 1; i++)
+            REQUIRE(counts[priorities[i]] >= distribution[i]);
+
+        REQUIRE(txSet->mTransactions.size() == 500);
+    }
 }
 
 // under surge
