@@ -1114,6 +1114,25 @@ TEST_CASE("whitelist", "[herder]")
         REQUIRE(accountWL2.getBalance() + wlAmount == wl2Balance);
         REQUIRE(accountWL.getBalance() == wlBalance);
     }
+
+    SECTION("no crash when adding invalid whitelist entry")
+    {
+        DataValue value;
+        value.resize(3);
+        SignatureHint hint =
+        SignatureUtils::getHint(accountWL.getPublicKey().ed25519());
+        for (int n = 0; n < 3; n++)
+        {
+            value[n] = (unsigned char)hint[n];
+        }
+
+        whitelist.manageData(KeyUtils::toStrKey(accountWL.getPublicKey()).substr(30),
+                             &value);
+
+        closeLedgerOn(*app, 2, 4, 11, 2018, txSet->mTransactions);
+
+        REQUIRE_NOTHROW(app->getWhitelist());
+    }
 }
 
 // under surge
