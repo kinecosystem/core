@@ -483,12 +483,17 @@ TEST_CASE("whitelist", "[herder]")
         }
 
         // adding whitelisted tx to the set
-        for (int n = 0; n < 19; n++)
+        for (int n = 0; n < 18; n++)
         {
             auto tx = accountWL.tx({payment(destAccount, n + 10)});
             tx->getEnvelope().tx.fee = 0;
             txSet->add(tx);
         }
+
+        // Add one tx from the whitelist holder's account
+        auto tx = whitelist.tx({payment(destAccount, 19 + 10)});
+        tx->getEnvelope().tx.fee = 0;
+        txSet->add(tx);
 
         // Sort for hash
         txSet->sortForHash();
@@ -499,10 +504,11 @@ TEST_CASE("whitelist", "[herder]")
         // validating the tx
         for (auto& tx3 : txSet->mTransactions)
         {
-            if (tx3->getSourceID() == accountWL.getPublicKey())
+            auto sourceID = tx3->getSourceID();
+            if (sourceID == accountWL.getPublicKey() || sourceID == whitelist.getPublicKey())
                 wlCount++;
             else
-                REQUIRE(tx3->getSourceID() == accountC.getPublicKey());
+                REQUIRE(sourceID == accountC.getPublicKey());
         }
 
         REQUIRE(txSet->mTransactions.size() == 20);
