@@ -1055,7 +1055,7 @@ TEST_CASE("checkdb succeeding", "[bucket][checkdb]")
         }
         REQUIRE(
             m.NewMeter({"bucket", "checkdb", "object-compare"}, "comparison")
-                .count() >= 10);
+                .count() >= 5);
     }
 
     SECTION("failing checkdb")
