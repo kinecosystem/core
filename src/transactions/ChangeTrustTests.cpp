@@ -32,12 +32,21 @@ TEST_CASE("change trust", "[tx][changetrust]")
     auto gateway = root.create("gw", minBalance2);
     Asset idr = makeAsset(gateway, "IDR");
 
-    SECTION("disabled check")
+    SECTION("disabled CHANGE_TRUST check")
     {
         for_all_versions(*app, [&] {
             // create a trustline with a limit of 0
             REQUIRE_THROWS_AS(root.changeTrust(idr, 100),
                               ex_CHANGE_TRUST_MALFORMED);
+        });
+    }
+
+    SECTION("disabled ALLOW_TRUST check")
+    {
+        for_all_versions(*app, [&] {
+            // create a trustline with a limit of 0
+            REQUIRE_THROWS_AS(root.allowTrust(idr, gateway),
+                              ex_ALLOW_TRUST_MALFORMED);
         });
     }
 }
