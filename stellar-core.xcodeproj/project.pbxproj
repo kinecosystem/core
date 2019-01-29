@@ -106,10 +106,8 @@
 		820009F3219E7EBD0079CDCA /* OperationFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82000706219E7EBC0079CDCA /* OperationFrame.cpp */; };
 		820009F7219E7EBD0079CDCA /* MergeTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8200070A219E7EBC0079CDCA /* MergeTests.cpp */; };
 		820009F9219E7EBD0079CDCA /* ManageDataOpFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8200070C219E7EBC0079CDCA /* ManageDataOpFrame.cpp */; };
-		820009FB219E7EBD0079CDCA /* AllowTrustTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82000710219E7EBC0079CDCA /* AllowTrustTests.cpp */; };
 		820009FC219E7EBD0079CDCA /* SetOptionsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82000711219E7EBC0079CDCA /* SetOptionsTests.cpp */; };
 		820009FF219E7EBD0079CDCA /* PathPaymentOpFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82000716219E7EBD0079CDCA /* PathPaymentOpFrame.cpp */; };
-		82000A00219E7EBD0079CDCA /* ChangeTrustTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82000717219E7EBD0079CDCA /* ChangeTrustTests.cpp */; };
 		82000A01219E7EBD0079CDCA /* AllowTrustOpFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82000718219E7EBD0079CDCA /* AllowTrustOpFrame.cpp */; };
 		82000A02219E7EBD0079CDCA /* TxResultsTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82000719219E7EBD0079CDCA /* TxResultsTests.cpp */; };
 		82000A03219E7EBD0079CDCA /* MergeOpFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8200071A219E7EBD0079CDCA /* MergeOpFrame.cpp */; };
@@ -321,6 +319,7 @@
 		82DA9BCC21C3C3BD005AFC77 /* PeerSharedKeyId.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BCB21C3C3BD005AFC77 /* PeerSharedKeyId.cpp */; };
 		82DA9BCF21C56B2A005AFC77 /* Whitelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BCE21C56B29005AFC77 /* Whitelist.cpp */; };
 		82DA9BD521C5731B005AFC77 /* ManagedDataCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BD421C5731B005AFC77 /* ManagedDataCache.cpp */; };
+		8297AB8821FF3B1100E2AA0D /* ChangeTrustTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8297AB8621FF3B1100E2AA0D /* ChangeTrustTests.cpp */; };
 		82DC9B0C21A2701D0082860C /* ConservationOfLumens.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DC9B0921A2701D0082860C /* ConservationOfLumens.cpp */; };
 		82DC9B0D21A2701D0082860C /* ConservationOfLumensTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DC9B0B21A2701D0082860C /* ConservationOfLumensTests.cpp */; };
 		82DC9B1021A270490082860C /* InflationOpFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DC9B0E21A270490082860C /* InflationOpFrame.cpp */; };
@@ -551,12 +550,10 @@
 		8200070C219E7EBC0079CDCA /* ManageDataOpFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ManageDataOpFrame.cpp; sourceTree = "<group>"; };
 		8200070D219E7EBC0079CDCA /* ManageDataOpFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManageDataOpFrame.h; sourceTree = "<group>"; };
 		8200070E219E7EBC0079CDCA /* SignatureChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignatureChecker.h; sourceTree = "<group>"; };
-		82000710219E7EBC0079CDCA /* AllowTrustTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AllowTrustTests.cpp; sourceTree = "<group>"; };
 		82000711219E7EBC0079CDCA /* SetOptionsTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SetOptionsTests.cpp; sourceTree = "<group>"; };
 		82000712219E7EBC0079CDCA /* TransactionFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TransactionFrame.h; sourceTree = "<group>"; };
 		82000713219E7EBC0079CDCA /* CreatePassiveOfferOpFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CreatePassiveOfferOpFrame.h; sourceTree = "<group>"; };
 		82000716219E7EBD0079CDCA /* PathPaymentOpFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PathPaymentOpFrame.cpp; sourceTree = "<group>"; };
-		82000717219E7EBD0079CDCA /* ChangeTrustTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChangeTrustTests.cpp; sourceTree = "<group>"; };
 		82000718219E7EBD0079CDCA /* AllowTrustOpFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AllowTrustOpFrame.cpp; sourceTree = "<group>"; };
 		82000719219E7EBD0079CDCA /* TxResultsTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TxResultsTests.cpp; sourceTree = "<group>"; };
 		8200071A219E7EBD0079CDCA /* MergeOpFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MergeOpFrame.cpp; sourceTree = "<group>"; };
@@ -1656,6 +1653,7 @@
 		82DA9BCE21C56B29005AFC77 /* Whitelist.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Whitelist.cpp; sourceTree = "<group>"; };
 		82DA9BD321C57319005AFC77 /* ManagedDataCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManagedDataCache.h; sourceTree = "<group>"; };
 		82DA9BD421C5731B005AFC77 /* ManagedDataCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ManagedDataCache.cpp; sourceTree = "<group>"; };
+		8297AB8621FF3B1100E2AA0D /* ChangeTrustTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChangeTrustTests.cpp; sourceTree = "<group>"; };
 		82DC9B0921A2701D0082860C /* ConservationOfLumens.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConservationOfLumens.cpp; sourceTree = "<group>"; };
 		82DC9B0B21A2701D0082860C /* ConservationOfLumensTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConservationOfLumensTests.cpp; sourceTree = "<group>"; };
 		82DC9B0E21A270490082860C /* InflationOpFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InflationOpFrame.cpp; sourceTree = "<group>"; };
@@ -2014,7 +2012,6 @@
 				82000763219E7EBD0079CDCA /* .dirstamp */,
 				82000718219E7EBD0079CDCA /* AllowTrustOpFrame.cpp */,
 				82000761219E7EBD0079CDCA /* AllowTrustOpFrame.h */,
-				82000710219E7EBC0079CDCA /* AllowTrustTests.cpp */,
 				82DA9BB821C3B3EE005AFC77 /* BumpSequenceOpFrame.cpp */,
 				82DA9BB721C3B3EE005AFC77 /* BumpSequenceOpFrame.h */,
 				82DA9BB921C3B3EE005AFC77 /* BumpSequenceTests.cpp */,
@@ -2031,6 +2028,32 @@
 				82DC9B0F21A270490082860C /* InflationTests.cpp */,
 				8200070C219E7EBC0079CDCA /* ManageDataOpFrame.cpp */,
 				8200070D219E7EBC0079CDCA /* ManageDataOpFrame.h */,
+				82000701219E7EBC0079CDCA /* CreatePassiveOfferOpFrame.cpp */,
+				82000702219E7EBC0079CDCA /* PaymentOpFrame.cpp */,
+				82000703219E7EBC0079CDCA /* ChangeTrustOpFrame.cpp */,
+				8297AB8621FF3B1100E2AA0D /* ChangeTrustTests.cpp */,
+				82000705219E7EBC0079CDCA /* PaymentOpFrame.h */,
+				82000706219E7EBC0079CDCA /* OperationFrame.cpp */,
+				8200070A219E7EBC0079CDCA /* MergeTests.cpp */,
+				8200070C219E7EBC0079CDCA /* ManageDataOpFrame.cpp */,
+				8200070D219E7EBC0079CDCA /* ManageDataOpFrame.h */,
+				8200070E219E7EBC0079CDCA /* SignatureChecker.h */,
+				82000711219E7EBC0079CDCA /* SetOptionsTests.cpp */,
+				82000712219E7EBC0079CDCA /* TransactionFrame.h */,
+				82000713219E7EBC0079CDCA /* CreatePassiveOfferOpFrame.h */,
+				82000716219E7EBD0079CDCA /* PathPaymentOpFrame.cpp */,
+				82000718219E7EBD0079CDCA /* AllowTrustOpFrame.cpp */,
+				82000719219E7EBD0079CDCA /* TxResultsTests.cpp */,
+				8200071A219E7EBD0079CDCA /* MergeOpFrame.cpp */,
+				8200071D219E7EBD0079CDCA /* SignatureUtils.h */,
+				8200071F219E7EBD0079CDCA /* PathPaymentOpFrame.h */,
+				82000720219E7EBD0079CDCA /* SignatureUtilsTest.cpp */,
+				82000721219E7EBD0079CDCA /* readme.md */,
+				82000722219E7EBD0079CDCA /* PaymentTests.cpp */,
+				82000723219E7EBD0079CDCA /* OperationFrame.h */,
+				82000724219E7EBD0079CDCA /* SetOptionsOpFrame.cpp */,
+				82000727219E7EBD0079CDCA /* SignatureChecker.cpp */,
+				82000728219E7EBD0079CDCA /* CreateAccountOpFrame.h */,
 				8200072B219E7EBD0079CDCA /* ManageDataTests.cpp */,
 				82000765219E7EBD0079CDCA /* ManageOfferOpFrame.cpp */,
 				82000733219E7EBD0079CDCA /* ManageOfferOpFrame.h */,
@@ -4025,6 +4048,7 @@
 				8200099B219E7EBD0079CDCA /* Logging.cpp in Sources */,
 				820009A9219E7EBD0079CDCA /* HashOfHash.cpp in Sources */,
 				82DA9BC721C3C1BB005AFC77 /* LiabilitiesMatchOffers.cpp in Sources */,
+				8297AB8821FF3B1100E2AA0D /* ChangeTrustTests.cpp in Sources */,
 				82000AB0219E7EBE0079CDCA /* PeerBareAddress.cpp in Sources */,
 				82000999219E7EBD0079CDCA /* TmpDir.cpp in Sources */,
 				820009B9219E7EBD0079CDCA /* SecretValue.cpp in Sources */,
@@ -4118,7 +4142,6 @@
 				820009DC219E7EBD0079CDCA /* PutHistoryArchiveStateWork.cpp in Sources */,
 				82000A7E219E7EBE0079CDCA /* SCPUnitTests.cpp in Sources */,
 				82000982219E7EBD0079CDCA /* AccountSubEntriesCountIsValidTests.cpp in Sources */,
-				82000A00219E7EBD0079CDCA /* ChangeTrustTests.cpp in Sources */,
 				8200099F219E7EBD0079CDCA /* Math.cpp in Sources */,
 				82000A81219E7EBE0079CDCA /* NtpSynchronizationChecker.cpp in Sources */,
 				82000ABE219E7EBE0079CDCA /* PeerAuth.cpp in Sources */,
@@ -4164,7 +4187,6 @@
 				820009EF219E7EBD0079CDCA /* CreatePassiveOfferOpFrame.cpp in Sources */,
 				82000AAE219E7EBE0079CDCA /* TrackerTests.cpp in Sources */,
 				82000954219E7EBD0079CDCA /* DataFrame.cpp in Sources */,
-				820009FB219E7EBD0079CDCA /* AllowTrustTests.cpp in Sources */,
 				82001CA7219E7FB10079CDCA /* util.cc in Sources */,
 				82001A3A219E7FAF0079CDCA /* easylogging++.cc in Sources */,
 				82000A40219E7EBE0079CDCA /* BucketList.cpp in Sources */,

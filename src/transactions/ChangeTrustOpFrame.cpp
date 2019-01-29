@@ -24,11 +24,8 @@ bool
 ChangeTrustOpFrame::doApply(Application& app, LedgerDelta& delta,
                             LedgerManager& ledgerManager)
 {
-    if (app.getLedgerManager().getCurrentLedgerVersion() > 9)
-    {
-        innerResult().code(CHANGE_TRUST_MALFORMED);
-        return false;
-    }
+    innerResult().code(CHANGE_TRUST_MALFORMED);
+    return false;
 
     Database& db = ledgerManager.getDatabase();
 
@@ -147,11 +144,8 @@ ChangeTrustOpFrame::doApply(Application& app, LedgerDelta& delta,
 bool
 ChangeTrustOpFrame::doCheckValid(Application& app)
 {
-    if (app.getLedgerManager().getCurrentLedgerVersion() > 9)
-    {
-        innerResult().code(CHANGE_TRUST_MALFORMED);
-        return false;
-    }
+    innerResult().code(CHANGE_TRUST_MALFORMED);
+    return false;
 
     if (mChangeTrust.limit < 0)
     {
