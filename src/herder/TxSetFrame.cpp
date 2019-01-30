@@ -361,8 +361,8 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 
         // calculate available unwhitelisted capacity
         size_t extraWhitelistCapacity = whitelisted.size() > wlCapacity
-                ? 0
-                : wlCapacity - whitelisted.size();
+            ? 0
+            : wlCapacity - whitelisted.size();
         size_t totalCapacity = reserveCapacity + extraWhitelistCapacity;
 
         // exit early, if the count of unwhitelisted is within the

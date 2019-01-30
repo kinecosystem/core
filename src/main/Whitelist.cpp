@@ -12,52 +12,36 @@ namespace stellar
 {
 const int32_t WHITELIST_PRIORITY_MAX = 0x7fffffff; // MAX of int32_t
 const int32_t WHITELIST_PRIORITY_NONE = 0;
+const int MAX_PRIORITY_COUNT = 20;
+const auto PRIORITY_COUNT_PREFIX = "priority_count_";
 
-// Available whitelisted capacity is split by whitelist priority.
-// Higher priorities receive a proportionally-larger percentage of
-// available capacity.
-std::vector<size_t> fairDistribution(size_t capacity,
-                                     const size_t slices,
-                                     size_t floor,
-                                     const int ratio)
+std::vector<size_t> fairDistribution(size_t capacity, std::vector<size_t> percentages)
 {
-    auto original = capacity;
-    size_t allocated = 0;
     std::vector<size_t> allocations = {};
+    size_t allocated = 0;
 
-    floor = floor > capacity ? 1 : floor;
-
-    allocations.resize(slices);
-
-    /*
-     This should never happen.  This will trigger when the available
-     capacity is lower than the number of priorities.
-
-     This will happen if the maxtxsetsize is too low, or if the reserve for
-     non-whitelisted txs is too high.
-    */
-    if (capacity < slices)
+    for (auto p: percentages)
     {
-        allocations[0] = std::max(capacity, (size_t)1);
+        auto allocation = (capacity * p) / 100;
+        allocations.emplace_back(allocation);
 
-        return allocations;
-    }
-
-    for (int i = 0; i < slices; i++) {
-        allocations[i] = floor;
-        capacity -= floor;
-    }
-
-    for (int i = 0; i < slices; i++) {
-        auto allocation = (capacity - allocated) * ratio / 100;
         allocated += allocation;
-        allocations[i] += allocation;
     }
 
-    allocations[0] += std::max(size_t(0),
-                               original - std::accumulate(allocations.begin(),
-                                                          allocations.end(),
-                                                          0));
+    // Due to rounding, some slots may be unallocated.
+    // Allocate such slots 1 at a time to each priority, until no slots remain.
+    auto available = capacity - allocated;
+    int i = 0;
+    while (available > 0)
+    {
+        allocations[i]++;
+        available--;
+
+        i++;
+
+        if (i >= allocations.size())
+            i = 0;
+    }
 
     return allocations;
 }
@@ -70,7 +54,10 @@ Whitelist::getAccount()
 
 void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
 {
+    mOverridePercentages = nullptr;
+
     std::unordered_set<int32_t> prioritySet;
+    std::unordered_map<std::string, DataValue> priorityPercentages;
 
     whitelist.clear();
 
@@ -84,11 +71,18 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
         auto name = data.dataName;
         auto value = data.dataValue;
 
+        // If the key starts with PRIORITY_COUNT_PREFIX, save for later.
+        if (name.find(PRIORITY_COUNT_PREFIX) == 0)
+        {
+            priorityPercentages[name] = value;
+            continue;
+        }
+
         // If the value isn't 4 or 8 bytes long, skip the entry.
         if (value.size() != 4 && value.size() != 8)
         {
             CLOG(INFO, "Whitelist")
-            << "bad value for: " << name;
+                << "bad value for: " << name;
 
             continue;
         }
@@ -135,7 +129,7 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
         catch (...)
         {
             CLOG(INFO, "Whitelist")
-            << "bad public key: " << name;
+                << "bad public key: " << name;
 
             continue;
         }
@@ -153,6 +147,72 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
     mPriorities.insert(mPriorities.end(),
                        prioritySet.begin(), prioritySet.end());
     std::sort(mPriorities.begin(), mPriorities.end(), std::greater<int32_t>());
+
+    // Search for an override for percentages, given the count of priorities.
+    char prio_count_str[20];
+    std::sprintf(prio_count_str, "%s%02d",
+                 PRIORITY_COUNT_PREFIX, (int)mPriorities.size());
+
+    auto it = priorityPercentages.find(prio_count_str);
+    if (it != priorityPercentages.end())
+    {
+        auto value = it->second;
+
+        if (value.size() < mPriorities.size())
+        {
+            CLOG(INFO, "Whitelist")
+                << "Found priority override has too few perccentages: "
+                << prio_count_str;
+
+            return;
+        }
+
+        std::vector<size_t> percentages;
+        for (auto b: value)
+        {
+            percentages.emplace_back((size_t)b);
+        }
+
+        auto sum = std::accumulate(percentages.begin(), percentages.end(), 0);
+        if (sum != 100)
+        {
+            CLOG(INFO, "Whitelist")
+                << "Percentages do not sum to 100: "
+                << sum;
+
+            return;
+        }
+
+        mOverridePercentages = std::make_shared<std::vector<size_t>>(percentages);
+    }
+}
+
+std::vector<std::vector<size_t>>
+Whitelist::defaultPercentages()
+{
+    return
+    {
+        {100},
+        {80, 20},
+        {77, 18, 5},
+        {74, 14, 7, 5},
+        {71, 12, 7, 5, 5},
+        {68, 10, 7, 5, 5, 5},
+        {64, 10, 6, 5, 5, 5, 5},
+        {60, 9, 6, 5, 5, 5, 5, 5},
+        {56, 8, 6, 5, 5, 5, 5, 5, 5},
+        {52, 7, 6, 5, 5, 5, 5, 5, 5, 5},
+        {47, 7, 6, 5, 5, 5, 5, 5, 5, 5, 5},
+        {42, 7, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {37, 7, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {32, 7, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {30, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {25, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {20, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {15, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}
+    };
 }
 
 // Translate the reserve percentage into the number of entries to reserve,
