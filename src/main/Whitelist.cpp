@@ -13,7 +13,7 @@ namespace stellar
 const int32_t WHITELIST_PRIORITY_MAX = 0x7fffffff; // MAX of int32_t
 const int32_t WHITELIST_PRIORITY_NONE = 0;
 const int MAX_PRIORITY_COUNT = 20;
-const auto PRIORITY_COUNT_PREFIX = "priority_count_";
+const char *PRIORITY_COUNT_PREFIX = "priority_count_";
 
 std::vector<size_t> fairDistribution(size_t capacity, std::vector<size_t> percentages)
 {
@@ -46,6 +46,22 @@ std::vector<size_t> fairDistribution(size_t capacity, std::vector<size_t> percen
     return allocations;
 }
 
+int32_t intFromBytes(DataValue value, int startingOffset = 0)
+{
+    return ((value[0 + startingOffset] << 24) +
+            (value[1 + startingOffset] << 16) +
+            (value[2 + startingOffset] << 8) +
+            value[3 + startingOffset]);
+}
+
+int32_t intFromBytes(SignatureHint value)
+{
+    return ((value[0] << 24) +
+            (value[1] << 16) +
+            (value[2] << 8) +
+            value[3]);
+}
+
 std::string
 Whitelist::getAccount()
 {
@@ -72,6 +88,7 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
         auto value = data.dataValue;
 
         // If the key starts with PRIORITY_COUNT_PREFIX, save for later.
+        // This check must precede checking value size.
         if (name.find(PRIORITY_COUNT_PREFIX) == 0)
         {
             priorityPercentages[name] = value;
@@ -89,17 +106,13 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
 
         // The first integer stored in value will be either the reserve
         // or the signature hint.
+        // The second integer, if present, is the priority for the entry.
         int32_t intVal, priority;
 
-        intVal =
-            (value[0] << 24) + (value[1] << 16) +
-            (value[2] << 8) + value[3];
-
-        if (value.size() == 8)
-            priority = (value[4] << 24) + (value[5] << 16) +
-                (value[6] << 8) + value[7];
-        else
-            priority = WHITELIST_PRIORITY_MAX;
+        intVal = intFromBytes(value);
+        priority = (value.size() == 8
+                    ? intFromBytes(value, 4)
+                    : WHITELIST_PRIORITY_MAX);
 
         // Collect the distinct set of priorities.
         prioritySet.insert(priority);
@@ -107,6 +120,7 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
         // The DataFrame entry is the percentage to reserve for
         // non-whitelisted txs.
         // Store the value and continue.
+        // TODO: treat non-whitelisted as just-another-priority, and get rid of reserve.
         if (name == "reserve")
         {
             auto reserve = intVal;
@@ -141,11 +155,21 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
         whitelist[hint] = keys;
     }
 
-    mPriorities.clear();
+    processPriorities(prioritySet, priorityPercentages);
+}
 
-    // Sort priorities in descending order.
+void
+Whitelist::processPriorities
+    (
+     std::unordered_set<int32_t> prioritySet,
+     std::unordered_map<std::string, DataValue> priorityPercentages
+     )
+{
+    mPriorities.clear();
     mPriorities.insert(mPriorities.end(),
                        prioritySet.begin(), prioritySet.end());
+
+    // Sort priorities in descending order.
     std::sort(mPriorities.begin(), mPriorities.end(), std::greater<int32_t>());
 
     // Search for an override for percentages, given the count of priorities.
@@ -154,37 +178,41 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
                  PRIORITY_COUNT_PREFIX, (int)mPriorities.size());
 
     auto it = priorityPercentages.find(prio_count_str);
-    if (it != priorityPercentages.end())
+    if (it == priorityPercentages.end())
+        return;
+
+    auto value = it->second;
+
+    if (value.size() < mPriorities.size())
     {
-        auto value = it->second;
+        CLOG(INFO, "Whitelist")
+            << "Matching priority override ["
+            << prio_count_str
+            << "] has too few perccentages: "
+            << prio_count_str;
 
-        if (value.size() < mPriorities.size())
-        {
-            CLOG(INFO, "Whitelist")
-                << "Found priority override has too few perccentages: "
-                << prio_count_str;
-
-            return;
-        }
-
-        std::vector<size_t> percentages;
-        for (auto b: value)
-        {
-            percentages.emplace_back((size_t)b);
-        }
-
-        auto sum = std::accumulate(percentages.begin(), percentages.end(), 0);
-        if (sum != 100)
-        {
-            CLOG(INFO, "Whitelist")
-                << "Percentages do not sum to 100: "
-                << sum;
-
-            return;
-        }
-
-        mOverridePercentages = std::make_shared<std::vector<size_t>>(percentages);
+        return;
     }
+
+    std::vector<size_t> percentages;
+    for (auto b: value)
+    {
+        percentages.emplace_back((size_t)b);
+    }
+
+    auto sum = std::accumulate(percentages.begin(), percentages.end(), 0);
+    if (sum != 100)
+    {
+        CLOG(INFO, "Whitelist")
+            << "Percentages for ["
+            << prio_count_str
+            << "] do not sum to 100: "
+            << sum;
+
+        return;
+    }
+
+    mOverridePercentages = std::make_shared<std::vector<size_t>>(percentages);
 }
 
 std::vector<std::vector<size_t>>
@@ -247,8 +275,7 @@ Whitelist::signerPriority(DecoratedSignature const& sig, Hash const& txHash)
 {
 	// Obtain the possible keys by indexing on the hint.
 
-    int32_t hintInt = (sig.hint[0] << 24) + (sig.hint[1] << 16) +
-                      (sig.hint[2] << 8) + sig.hint[3];
+    int32_t hintInt = intFromBytes(sig.hint);
 
     auto it = whitelist.find(hintInt);
 

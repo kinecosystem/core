@@ -9,6 +9,7 @@ namespace stellar
 extern const int32_t WHITELIST_PRIORITY_MAX;
 extern const int32_t WHITELIST_PRIORITY_NONE;
 extern const int MAX_PRIORITY_COUNT;
+extern const char *PRIORITY_COUNT_PREFIX;
 
 typedef struct {
     string64 key;
@@ -57,6 +58,11 @@ class Whitelist : public ManagedDataCache
     virtual void fulfill(std::vector<DataFrame::pointer> dfs) override;
 
   private:
+    void processPriorities
+    (
+     std::unordered_set<int32_t> prioritySet,
+     std::unordered_map<std::string, DataValue> priorityPercentages
+     );
     std::vector<std::vector<size_t>> defaultPercentages();
 
     std::unordered_map<uint32_t, std::vector<WhitelistEntry>> whitelist;
