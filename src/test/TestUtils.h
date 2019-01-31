@@ -31,6 +31,13 @@ void addWhitelistEntry(Application::pointer app,
                        TestAccount account,
                        int32_t priority = WHITELIST_PRIORITY_MAX);
 
+void
+addWhitelistPriorityOverride(Application::pointer app,
+                             TxSetFramePtr txSet,
+                             TestAccount whitelist,
+                             int priorities_count,
+                             std::vector<int8_t> percentages);
+    
 class BucketListDepthModifier
 {
     uint32_t const mPrevDepth;

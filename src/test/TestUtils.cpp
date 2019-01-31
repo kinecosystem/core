@@ -56,12 +56,12 @@ addWhitelistEntry(Application::pointer app,
                   int32_t priority) {
     DataValue value;
 
-     // the default value is not recorded
+    // the default value is not recorded
     value.resize(priority == WHITELIST_PRIORITY_MAX ? 4 : 8);
 
     SignatureHint hint =
-        SignatureUtils::getHint(account.getPublicKey().ed25519());
-    
+    SignatureUtils::getHint(account.getPublicKey().ed25519());
+
     for (int n = 0; n < 4; n++)
     {
         value[n] = (unsigned char)hint[n];
@@ -75,6 +75,29 @@ addWhitelistEntry(Application::pointer app,
 
     whitelist.manageData(KeyUtils::toStrKey(account.getPublicKey()),
                          &value);
+}
+
+void
+addWhitelistPriorityOverride(Application::pointer app,
+                             TxSetFramePtr txSet,
+                             TestAccount whitelist,
+                             int priorities_count,
+                             std::vector<int8_t> percentages) {
+    DataValue value;
+
+    // the default value is not recorded
+    value.resize((uint32_t)percentages.size());
+
+    for (int n = 0; n < percentages.size(); n++)
+    {
+        value[n] = percentages[n];
+    }
+
+    char prio_count_str[20];
+    std::sprintf(prio_count_str, "%s%02d",
+                 PRIORITY_COUNT_PREFIX, priorities_count);
+
+    whitelist.manageData(prio_count_str, &value);
 }
 
 BucketListDepthModifier::BucketListDepthModifier(uint32_t newDepth)
