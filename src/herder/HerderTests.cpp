@@ -1017,6 +1017,27 @@ TEST_CASE("whitelist", "[herder]")
         REQUIRE(distribution[1] != 118 / 2);
     }
 
+    SECTION("priority: too many priorities")
+    {
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL, 2000);
+
+        for (int i = 0; i < MAX_PRIORITY_COUNT + 1; i++)
+        {
+            char seed[30];
+            sprintf(seed, "account%d", i);
+            auto account = root.create(seed, 5000000000);
+
+            stellar::testutil::addWhitelistEntry(app, txSet,
+                                                 whitelist, account, i + 1);
+        }
+
+        closeLedgerOn(*app, 2, 1, 11, 2018, txSet->mTransactions);
+
+        auto distribution = app->getWhitelist().distribution(118);
+
+        REQUIRE(distribution.size() == 0);
+    }
+
     SECTION("priority: filtering - ideal distribution ")
     {
         app->getLedgerManager().getCurrentLedgerHeader().maxTxSetSize = 500;
