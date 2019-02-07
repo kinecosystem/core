@@ -134,11 +134,14 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
             continue;
         }
 
+        int32_t hint = 0;
+
         try
         {
             // An exception is thrown if the key isn't convertible.
             // If this occurs, the entry is skipped.
-            KeyUtils::fromStrKey<PublicKey>(name);
+            auto key = KeyUtils::fromStrKey<PublicKey>(name);
+            hint = intFromBytes(SignatureUtils::getHint(key.ed25519()));
         }
         catch (...)
         {
@@ -147,8 +150,6 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
 
             continue;
         }
-
-        auto hint = intVal;
 
         auto keys = whitelist[hint];
         keys.emplace_back(WhitelistEntry({name, priority}));
@@ -196,9 +197,7 @@ Whitelist::processPriorities
 
     std::vector<size_t> percentages;
     for (auto b: value)
-    {
         percentages.emplace_back((size_t)b);
-    }
 
     auto sum = std::accumulate(percentages.begin(), percentages.end(), 0);
     if (sum != 100)
