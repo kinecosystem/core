@@ -60,7 +60,7 @@ addWhitelistEntry(Application::pointer app,
     value.resize(priority == WHITELIST_PRIORITY_MAX ? 4 : 8);
 
     SignatureHint hint =
-    SignatureUtils::getHint(account.getPublicKey().ed25519());
+        SignatureUtils::getHint(account.getPublicKey().ed25519());
 
     for (int n = 0; n < 4; n++)
     {

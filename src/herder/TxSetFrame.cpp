@@ -197,7 +197,7 @@ distribute(std::vector<std::vector<TransactionFramePtr>> txs,
     // Initial allocation, based on the ideal distribution.
     for (int i = 0; i < txs.size(); i++)
     {
-        auto txAllocation = std::min(txs[i].size(), (size_t)distribution[i]);
+        auto txAllocation = std::min(txs[i].size(), distribution[i]);
 
         unallocatedPercentage +=
             txs[i].size() - txAllocation > 0 ? distribution[i] : 0;
@@ -346,18 +346,20 @@ TxSetFrame::surgePricingFilter(LedgerManager const& lm, Application& app)
 
         auto wlCapacity = max - reserveCapacity;
 
-        auto groupedTxs = groupTxs(whitelisted, whitelist.priorities());
-        auto distribution = distribute(groupedTxs,
-                                       whitelist.distribution(wlCapacity));
-
         // remove the over-capacity txs
         if (whitelisted.size() > wlCapacity)
+        {
+            auto groupedTxs = groupTxs(whitelisted, whitelist.priorities());
+            auto distribution = distribute(groupedTxs,
+                                           whitelist.distribution(wlCapacity));
+
             for (int i = 0; i < groupedTxs.size(); i++)
                 for (auto iter = groupedTxs[i].begin() + distribution[i].size();
                      iter != groupedTxs[i].end(); iter++)
                 {
                     removeTx(*iter);
                 }
+        }
 
         // calculate available unwhitelisted capacity
         size_t extraWhitelistCapacity = whitelisted.size() > wlCapacity

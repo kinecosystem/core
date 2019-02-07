@@ -32,9 +32,7 @@ class Whitelist : public ManagedDataCache
         return mPriorities;
     }
 
-    // The capacity parameter is the number of slots available to
-    // whitelisted txs.
-    std::vector<size_t> distribution(size_t capacity)
+    std::vector<size_t> distribution(size_t whitelistCapacity)
     {
         auto count = mPriorities.size();
 
@@ -42,9 +40,11 @@ class Whitelist : public ManagedDataCache
             return std::vector<size_t>();
 
         if (mOverridePercentages != nullptr)
-            return fairDistribution(capacity, *mOverridePercentages.get());
+            return fairDistribution(whitelistCapacity,
+                                    *mOverridePercentages.get());
 
-        return fairDistribution(capacity, defaultPercentages()[count - 1]);
+        return fairDistribution(whitelistCapacity,
+                                defaultPercentages()[count - 1]);
     }
 
     size_t unwhitelistedReserve(size_t setSize);
