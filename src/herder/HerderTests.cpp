@@ -977,7 +977,7 @@ TEST_CASE("whitelist", "[herder]")
         REQUIRE(distribution[1] == 118 / 2);
     }
 
-    SECTION("priority: distribution override - invalid count of percentages")
+    SECTION("priority: distribution override - too few percentages")
     {
         stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL, 2000);
         stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL2, 1000);
@@ -987,6 +987,26 @@ TEST_CASE("whitelist", "[herder]")
                                                         whitelist,
                                                         2,
                                                         {100});
+
+        closeLedgerOn(*app, 2, 1, 11, 2018, txSet->mTransactions);
+
+        auto distribution = app->getWhitelist().distribution(118);
+
+        REQUIRE(distribution.size() == 2);
+        REQUIRE(distribution[0] != 118 / 2);
+        REQUIRE(distribution[1] != 118 / 2);
+    }
+
+    SECTION("priority: distribution override - too many percentages")
+    {
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL, 2000);
+        stellar::testutil::addWhitelistEntry(app, txSet, whitelist, accountWL2, 1000);
+
+        stellar::testutil::addWhitelistPriorityOverride(app,
+                                                        txSet,
+                                                        whitelist,
+                                                        2,
+                                                        {50, 25, 25});
 
         closeLedgerOn(*app, 2, 1, 11, 2018, txSet->mTransactions);
 

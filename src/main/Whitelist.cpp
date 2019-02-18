@@ -184,13 +184,13 @@ Whitelist::processPriorities
 
     auto value = it->second;
 
-    if (value.size() < mPriorities.size())
+    if (value.size() != mPriorities.size())
     {
         CLOG(INFO, "Whitelist")
             << "Matching priority override ["
             << prio_count_str
-            << "] has too few perccentages: "
-            << prio_count_str;
+        << "] has wrong number of percentages. (expected/actual): "
+            << prio_count_str << "/" << value.size();
 
         return;
     }
