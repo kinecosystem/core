@@ -34,7 +34,8 @@ TEST_CASE("change trust", "[tx][changetrust]")
 
     SECTION("disabled CHANGE_TRUST check")
     {
-        for_all_versions(*app, [&] {
+        for_versions_from(10, *app, [&] {
+            // create a trustline with a limit of 0
             REQUIRE_THROWS_AS(root.changeTrust(idr, 100),
                               ex_CHANGE_TRUST_MALFORMED);
         });
@@ -42,7 +43,8 @@ TEST_CASE("change trust", "[tx][changetrust]")
 
     SECTION("disabled ALLOW_TRUST check")
     {
-        for_all_versions(*app, [&] {
+        for_versions_from(10, *app, [&] {
+            // create a trustline with a limit of 0
             REQUIRE_THROWS_AS(root.allowTrust(idr, gateway),
                               ex_ALLOW_TRUST_MALFORMED);
         });
