@@ -29,8 +29,11 @@ bool
 AllowTrustOpFrame::doApply(Application& app, LedgerDelta& delta,
                            LedgerManager& ledgerManager)
 {
-    innerResult().code(ALLOW_TRUST_MALFORMED);
-    return false;
+    if (app.getLedgerManager().getCurrentLedgerVersion() > 9)
+    {
+        innerResult().code(ALLOW_TRUST_MALFORMED);
+        return false;
+    }
 
     if (ledgerManager.getCurrentLedgerVersion() > 2)
     {
@@ -110,8 +113,11 @@ AllowTrustOpFrame::doApply(Application& app, LedgerDelta& delta,
 bool
 AllowTrustOpFrame::doCheckValid(Application& app)
 {
-    innerResult().code(ALLOW_TRUST_MALFORMED);
-    return false;
+    if (app.getLedgerManager().getCurrentLedgerVersion() > 9)
+    {
+        innerResult().code(ALLOW_TRUST_MALFORMED);
+        return false;
+    }
 
     if (mAllowTrust.asset.type() == ASSET_TYPE_NATIVE)
     {
