@@ -11,6 +11,7 @@
 #include "ledger/LedgerManager.h"
 #include "lib/xdrpp/xdrpp/printer.h"
 #include "main/Application.h"
+#include "main/Whitelist.h"
 #include "util/format.h"
 #include <medida/meter.h>
 #include <medida/metrics_registry.h>
@@ -227,6 +228,11 @@ ApplyLedgerChainWork::applyHistoryOfSingleLedger()
 
     LedgerCloseData closeData(header.ledgerSeq, txset, header.scpValue);
     lm.closeLedger(closeData);
+
+    // Catchup does not apply operations via *OpFrame::doApply().  It is thus
+    // necessary to update the whitelist after each close, as we cannot rely
+    // on detecting changes to the whitelist holder's account via MANAGE_DATA.
+    app().getWhitelist().setNeedsUpdate();
 
     CLOG(DEBUG, "History") << "LedgerManager LCL:\n"
                            << xdr::xdr_to_string(
