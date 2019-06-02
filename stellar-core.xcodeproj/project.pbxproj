@@ -304,6 +304,7 @@
 		82001EA021A0A4E30079CDCA /* standard-into-type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82000B85219E7FAA0079CDCA /* standard-into-type.cpp */; };
 		8200237021A120140079CDCA /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8200236F21A11FE60079CDCA /* libsodium.a */; };
 		8236654521A153B2007B6DFE /* libpq.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 8236654421A153B2007B6DFE /* libpq.tbd */; };
+		8297AB8821FF3B1100E2AA0D /* ChangeTrustTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8297AB8621FF3B1100E2AA0D /* ChangeTrustTests.cpp */; };
 		82DA9B3C21C3A8C7005AFC77 /* asio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA994921C3A8C2005AFC77 /* asio.cpp */; };
 		82DA9BA821C3B1BE005AFC77 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 82DA9BA721C3B1BE005AFC77 /* libssl.a */; };
 		82DA9BB321C3B3AA005AFC77 /* numeric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BAB21C3B3A9005AFC77 /* numeric.cpp */; };
@@ -319,7 +320,6 @@
 		82DA9BCC21C3C3BD005AFC77 /* PeerSharedKeyId.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BCB21C3C3BD005AFC77 /* PeerSharedKeyId.cpp */; };
 		82DA9BCF21C56B2A005AFC77 /* Whitelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BCE21C56B29005AFC77 /* Whitelist.cpp */; };
 		82DA9BD521C5731B005AFC77 /* ManagedDataCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DA9BD421C5731B005AFC77 /* ManagedDataCache.cpp */; };
-		8297AB8821FF3B1100E2AA0D /* ChangeTrustTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8297AB8621FF3B1100E2AA0D /* ChangeTrustTests.cpp */; };
 		82DC9B0C21A2701D0082860C /* ConservationOfLumens.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DC9B0921A2701D0082860C /* ConservationOfLumens.cpp */; };
 		82DC9B0D21A2701D0082860C /* ConservationOfLumensTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DC9B0B21A2701D0082860C /* ConservationOfLumensTests.cpp */; };
 		82DC9B1021A270490082860C /* InflationOpFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82DC9B0E21A270490082860C /* InflationOpFrame.cpp */; };
@@ -1216,6 +1216,7 @@
 		82001D5221A087630079CDCA /* libutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8200236A21A11FE60079CDCA /* sodium.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sodium.xcodeproj; sourceTree = "<group>"; };
 		8236654421A153B2007B6DFE /* libpq.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libpq.tbd; path = usr/lib/libpq.tbd; sourceTree = SDKROOT; };
+		8297AB8621FF3B1100E2AA0D /* ChangeTrustTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChangeTrustTests.cpp; sourceTree = "<group>"; };
 		82DA96FC21C3A8BC005AFC77 /* write_at.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = write_at.hpp; sourceTree = "<group>"; };
 		82DA96FD21C3A8BC005AFC77 /* serial_port_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = serial_port_base.hpp; sourceTree = "<group>"; };
 		82DA96FE21C3A8BC005AFC77 /* buffered_read_stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = buffered_read_stream.hpp; sourceTree = "<group>"; };
@@ -1653,7 +1654,6 @@
 		82DA9BCE21C56B29005AFC77 /* Whitelist.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Whitelist.cpp; sourceTree = "<group>"; };
 		82DA9BD321C57319005AFC77 /* ManagedDataCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManagedDataCache.h; sourceTree = "<group>"; };
 		82DA9BD421C5731B005AFC77 /* ManagedDataCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ManagedDataCache.cpp; sourceTree = "<group>"; };
-		8297AB8621FF3B1100E2AA0D /* ChangeTrustTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChangeTrustTests.cpp; sourceTree = "<group>"; };
 		82DC9B0921A2701D0082860C /* ConservationOfLumens.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConservationOfLumens.cpp; sourceTree = "<group>"; };
 		82DC9B0B21A2701D0082860C /* ConservationOfLumensTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConservationOfLumensTests.cpp; sourceTree = "<group>"; };
 		82DC9B0E21A270490082860C /* InflationOpFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InflationOpFrame.cpp; sourceTree = "<group>"; };
@@ -2010,49 +2010,23 @@
 			isa = PBXGroup;
 			children = (
 				82000763219E7EBD0079CDCA /* .dirstamp */,
-				82000718219E7EBD0079CDCA /* AllowTrustOpFrame.cpp */,
 				82000761219E7EBD0079CDCA /* AllowTrustOpFrame.h */,
 				82DA9BB821C3B3EE005AFC77 /* BumpSequenceOpFrame.cpp */,
 				82DA9BB721C3B3EE005AFC77 /* BumpSequenceOpFrame.h */,
 				82DA9BB921C3B3EE005AFC77 /* BumpSequenceTests.cpp */,
-				82000703219E7EBC0079CDCA /* ChangeTrustOpFrame.cpp */,
 				82000768219E7EBD0079CDCA /* ChangeTrustOpFrame.h */,
-				82000717219E7EBD0079CDCA /* ChangeTrustTests.cpp */,
 				8200072E219E7EBD0079CDCA /* CreateAccountOpFrame.cpp */,
-				82000728219E7EBD0079CDCA /* CreateAccountOpFrame.h */,
-				82000701219E7EBC0079CDCA /* CreatePassiveOfferOpFrame.cpp */,
-				82000713219E7EBC0079CDCA /* CreatePassiveOfferOpFrame.h */,
 				82000735219E7EBD0079CDCA /* ExchangeTests.cpp */,
 				82DC9B0E21A270490082860C /* InflationOpFrame.cpp */,
 				82DA9BB621C3B3EE005AFC77 /* InflationOpFrame.h */,
 				82DC9B0F21A270490082860C /* InflationTests.cpp */,
-				8200070C219E7EBC0079CDCA /* ManageDataOpFrame.cpp */,
-				8200070D219E7EBC0079CDCA /* ManageDataOpFrame.h */,
 				82000701219E7EBC0079CDCA /* CreatePassiveOfferOpFrame.cpp */,
-				82000702219E7EBC0079CDCA /* PaymentOpFrame.cpp */,
 				82000703219E7EBC0079CDCA /* ChangeTrustOpFrame.cpp */,
 				8297AB8621FF3B1100E2AA0D /* ChangeTrustTests.cpp */,
-				82000705219E7EBC0079CDCA /* PaymentOpFrame.h */,
-				82000706219E7EBC0079CDCA /* OperationFrame.cpp */,
-				8200070A219E7EBC0079CDCA /* MergeTests.cpp */,
 				8200070C219E7EBC0079CDCA /* ManageDataOpFrame.cpp */,
 				8200070D219E7EBC0079CDCA /* ManageDataOpFrame.h */,
-				8200070E219E7EBC0079CDCA /* SignatureChecker.h */,
-				82000711219E7EBC0079CDCA /* SetOptionsTests.cpp */,
-				82000712219E7EBC0079CDCA /* TransactionFrame.h */,
 				82000713219E7EBC0079CDCA /* CreatePassiveOfferOpFrame.h */,
-				82000716219E7EBD0079CDCA /* PathPaymentOpFrame.cpp */,
 				82000718219E7EBD0079CDCA /* AllowTrustOpFrame.cpp */,
-				82000719219E7EBD0079CDCA /* TxResultsTests.cpp */,
-				8200071A219E7EBD0079CDCA /* MergeOpFrame.cpp */,
-				8200071D219E7EBD0079CDCA /* SignatureUtils.h */,
-				8200071F219E7EBD0079CDCA /* PathPaymentOpFrame.h */,
-				82000720219E7EBD0079CDCA /* SignatureUtilsTest.cpp */,
-				82000721219E7EBD0079CDCA /* readme.md */,
-				82000722219E7EBD0079CDCA /* PaymentTests.cpp */,
-				82000723219E7EBD0079CDCA /* OperationFrame.h */,
-				82000724219E7EBD0079CDCA /* SetOptionsOpFrame.cpp */,
-				82000727219E7EBD0079CDCA /* SignatureChecker.cpp */,
 				82000728219E7EBD0079CDCA /* CreateAccountOpFrame.h */,
 				8200072B219E7EBD0079CDCA /* ManageDataTests.cpp */,
 				82000765219E7EBD0079CDCA /* ManageOfferOpFrame.cpp */,
@@ -4408,8 +4382,8 @@
 		82000545219E7E5A0079CDCA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = MZAK745F32;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = 4VM2T2M2T8;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					ASIO_STANDALONE,
 					"ASIO_SEPARATE_COMPILATION=1",
@@ -4424,7 +4398,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/usr/local/Cellar/openssl/1.0.2q/lib,
+					/usr/local/Cellar/openssl/1.0.2r/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4446,8 +4420,8 @@
 		82000546219E7E5A0079CDCA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = MZAK745F32;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = 4VM2T2M2T8;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					ASIO_STANDALONE,
 					"ASIO_SEPARATE_COMPILATION=1",
@@ -4462,7 +4436,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/usr/local/Cellar/openssl/1.0.2q/lib,
+					/usr/local/Cellar/openssl/1.0.2r/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
