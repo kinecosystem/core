@@ -272,6 +272,9 @@ doInflation(Application& app, int ledgerVersion, int nbAccounts,
     REQUIRE(expectedWinnerCount == payouts.size());
 }
 
+/*
+ INFLATION op is disabled.
+
 TEST_CASE("inflation", "[tx][inflation]")
 {
     Config const& cfg = getTestConfig(0);
@@ -632,3 +635,4 @@ TEST_CASE("inflation", "[tx][inflation]")
         }
     }
 }
+*/
