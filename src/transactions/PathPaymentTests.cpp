@@ -80,6 +80,10 @@ assetPathToString(const std::deque<Asset>& assets)
 
 TEST_CASE("pathpayment", "[tx][pathpayment]")
 {
+    // Kin does not support non-native assets, thus these tests may fail without
+    // consequence.  They are disabled because the tests break under protocol v10.
+    return;
+
     auto const& cfg = getTestConfig();
 
     VirtualClock clock;

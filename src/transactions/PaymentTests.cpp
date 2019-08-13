@@ -1409,58 +1409,60 @@ TEST_CASE("payment", "[tx][payment]")
 
         SECTION("with trust")
         {
-            a1.changeTrust(idr, 1000);
-            gateway.pay(a1, idr, 100);
+            for_versions_to(9, *app, [&] {
+                a1.changeTrust(idr, 1000);
+                gateway.pay(a1, idr, 100);
 
-            TrustFrame::pointer line;
-            line = loadTrustLine(a1, idr, *app);
-            REQUIRE(line->getBalance() == 100);
+                TrustFrame::pointer line;
+                line = loadTrustLine(a1, idr, *app);
+                REQUIRE(line->getBalance() == 100);
 
-            // create b1 account
-            auto b1 = root.create("B", paymentAmount);
+                // create b1 account
+                auto b1 = root.create("B", paymentAmount);
 
-            b1.changeTrust(idr, 100);
+                b1.changeTrust(idr, 100);
 
-            SECTION("positive")
-            {
-                for_all_versions(*app, [&] {
-                    // first, send 40 from a1 to b1
-                    a1.pay(b1, idr, 40);
+                SECTION("positive")
+                {
+                    for_all_versions(*app, [&] {
+                        // first, send 40 from a1 to b1
+                        a1.pay(b1, idr, 40);
 
-                    line = loadTrustLine(a1, idr, *app);
-                    REQUIRE(line->getBalance() == 60);
-                    line = loadTrustLine(b1, idr, *app);
-                    REQUIRE(line->getBalance() == 40);
+                        line = loadTrustLine(a1, idr, *app);
+                        REQUIRE(line->getBalance() == 60);
+                        line = loadTrustLine(b1, idr, *app);
+                        REQUIRE(line->getBalance() == 40);
 
-                    // then, send back to the gateway
-                    // the gateway does not have a trust line as it's the issuer
-                    b1.pay(gateway, idr, 40);
-                    line = loadTrustLine(b1, idr, *app);
-                    REQUIRE(line->getBalance() == 0);
-                });
-            }
-            SECTION("missing issuer")
-            {
-                for_all_versions(*app, [&] {
-                    gateway.merge(root);
-                    // cannot send to an account that is not the issuer
-                    REQUIRE_THROWS_AS(a1.pay(b1, idr, 40),
-                                      ex_PAYMENT_NO_ISSUER);
-                    // should be able to send back credits to issuer
-                    a1.pay(gateway, idr, 75);
-                    // cannot change the limit
-                    REQUIRE_THROWS_AS(a1.changeTrust(idr, 25),
-                                      ex_CHANGE_TRUST_NO_ISSUER);
-                    a1.pay(gateway, idr, 25);
-                    // and should be able to delete the trust line too
-                    a1.changeTrust(idr, 0);
-                });
-            }
+                        // then, send back to the gateway
+                        // the gateway does not have a trust line as it's the issuer
+                        b1.pay(gateway, idr, 40);
+                        line = loadTrustLine(b1, idr, *app);
+                        REQUIRE(line->getBalance() == 0);
+                    });
+                }
+                SECTION("missing issuer")
+                {
+                    for_all_versions(*app, [&] {
+                        gateway.merge(root);
+                        // cannot send to an account that is not the issuer
+                        REQUIRE_THROWS_AS(a1.pay(b1, idr, 40),
+                                          ex_PAYMENT_NO_ISSUER);
+                        // should be able to send back credits to issuer
+                        a1.pay(gateway, idr, 75);
+                        // cannot change the limit
+                        REQUIRE_THROWS_AS(a1.changeTrust(idr, 25),
+                                          ex_CHANGE_TRUST_NO_ISSUER);
+                        a1.pay(gateway, idr, 25);
+                        // and should be able to delete the trust line too
+                        a1.changeTrust(idr, 0);
+                    });
+                }
+            });
         }
     }
     SECTION("issuer large amounts")
     {
-        for_all_versions(*app, [&] {
+        for_versions_to(9, *app, [&] {
             a1.changeTrust(idr, INT64_MAX);
             gateway.pay(a1, idr, INT64_MAX);
             TrustFrame::pointer line;
@@ -1480,7 +1482,7 @@ TEST_CASE("payment", "[tx][payment]")
     }
     SECTION("authorize flag")
     {
-        for_all_versions(*app, [&] {
+        for_versions_to(9, *app, [&] {
             gateway.setOptions(
                 setFlags(uint32_t{AUTH_REQUIRED_FLAG | AUTH_REVOCABLE_FLAG}));
 
@@ -1527,6 +1529,10 @@ TEST_CASE("payment", "[tx][payment]")
                 auto account = loadAccount(sendToSelf, *app);
                 REQUIRE(account->getBalance() == minBalance2 - txfee);
             }
+
+            // Kin does not support non-native assets, so failures of the
+            // following tests are OK.
+            return;
 
             auto fakeCur = makeAsset(gateway, "fake");
             auto fakeWithFakeAccountCur =
@@ -1781,6 +1787,10 @@ TEST_CASE("payment", "[tx][payment]")
 
     SECTION("liabilities")
     {
+        // Kin does not support non-native assets, so failures of the
+        // following tests are OK.
+        return;
+
         SECTION("cannot pay balance below selling liabilities")
         {
             a1.changeTrust(idr, 200);

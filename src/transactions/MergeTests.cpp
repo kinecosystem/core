@@ -455,32 +455,34 @@ TEST_CASE("merge", "[tx][merge]")
     {
         SECTION("with trustline")
         {
-            Asset usd = makeAsset(gateway, "USD");
-            a1.changeTrust(usd, trustLineLimit);
+            for_versions_to(9, *app, [&] {
+                Asset usd = makeAsset(gateway, "USD");
+                a1.changeTrust(usd, trustLineLimit);
 
-            SECTION("account has trust line")
-            {
-                for_all_versions(*app, [&] {
-                    REQUIRE_THROWS_AS(a1.merge(b1),
-                                      ex_ACCOUNT_MERGE_HAS_SUB_ENTRIES);
-                });
-            }
-            SECTION("account has offer")
-            {
-                for_all_versions(*app, [&] {
-                    gateway.pay(a1, usd, trustLineBalance);
-                    auto xlm = makeNativeAsset();
-                    auto curIssued = a1.asset("CUR1");
+                SECTION("account has trust line")
+                {
+                    for_versions_to(9, *app, [&] {
+                        REQUIRE_THROWS_AS(a1.merge(b1),
+                                          ex_ACCOUNT_MERGE_HAS_SUB_ENTRIES);
+                    });
+                }
+                SECTION("account has offer")
+                {
+                    for_versions_to(9, *app, [&] {
+                        gateway.pay(a1, usd, trustLineBalance);
+                        auto xlm = makeNativeAsset();
+                        auto curIssued = a1.asset("CUR1");
 
-                    const Price somePrice(3, 2);
-                    for (int i = 0; i < 4; i++)
-                    {
-                        a1.manageOffer(0, xlm, curIssued, somePrice, 100);
-                    }
-                    REQUIRE_THROWS_AS(a1.merge(b1),
-                                      ex_ACCOUNT_MERGE_HAS_SUB_ENTRIES);
-                });
-            }
+                        const Price somePrice(3, 2);
+                        for (int i = 0; i < 4; i++)
+                        {
+                            a1.manageOffer(0, xlm, curIssued, somePrice, 100);
+                        }
+                        REQUIRE_THROWS_AS(a1.merge(b1),
+                                          ex_ACCOUNT_MERGE_HAS_SUB_ENTRIES);
+                    });
+                }
+            });
         }
 
         SECTION("account has data")
