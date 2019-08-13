@@ -90,8 +90,8 @@ ManageDataOpFrame::doApply(Application& app, LedgerDelta& delta,
         dataFrame->storeDelete(delta, db);
     }
 
-    auto wlID = *app.getWhitelist().accountID().get();
-    if (getSourceID() == wlID) {
+    auto wlID = app.getWhitelist().accountID().get();
+    if (wlID != NULL && getSourceID() == *wlID) {
         app.getWhitelist().setNeedsUpdate();
     }
 
