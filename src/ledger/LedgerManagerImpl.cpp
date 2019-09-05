@@ -1066,14 +1066,14 @@ LedgerManagerImpl::applyTransactions(std::vector<TransactionFramePtr>& txs,
     for (auto tx : txs)
     {
         auto txTime = mTransactionApply.TimeScope();
-        TransactionMeta tm(1);
+        TransactionMeta tm;
         try
         {
             CLOG(DEBUG, "Tx")
                 << " tx#" << index << " = " << hexAbbrev(tx->getFullHash())
                 << " txseq=" << tx->getSeqNum() << " (@ "
                 << mApp.getConfig().toShortString(tx->getSourceID()) << ")";
-            tx->apply(ledgerDelta, tm.v1(), mApp);
+            tx->apply(ledgerDelta, tm, mApp);
         }
         catch (InvariantDoesNotHold& e)
         {

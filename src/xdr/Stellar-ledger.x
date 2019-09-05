@@ -277,7 +277,5 @@ union TransactionMeta switch (int v)
 {
 case 0:
     OperationMeta operations<>;
-case 1:
-    TransactionMetaV1 v1;
 };
 }
