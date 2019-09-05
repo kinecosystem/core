@@ -588,13 +588,13 @@ TransactionFrame::markResultFailed()
 bool
 TransactionFrame::apply(LedgerDelta& delta, Application& app)
 {
-    TransactionMeta tm(1);
-    return apply(delta, tm.v1(), app);
+    TransactionMeta tm;
+    return apply(delta, tm, app);
 }
 
 bool
 TransactionFrame::applyOperations(SignatureChecker& signatureChecker,
-                                  LedgerDelta& delta, TransactionMetaV1& meta,
+                                  LedgerDelta& delta, TransactionMeta& meta,
                                   Application& app)
 {
     bool errorEncountered = false;
@@ -623,7 +623,7 @@ TransactionFrame::applyOperations(SignatureChecker& signatureChecker,
                 app.getInvariantManager().checkOnOperationApply(
                     op->getOperation(), op->getResult(), opDelta);
             }
-            meta.operations.emplace_back(opDelta.getChanges());
+            meta.operations().emplace_back(opDelta.getChanges());
             opDelta.commit();
         }
 
@@ -652,7 +652,7 @@ TransactionFrame::applyOperations(SignatureChecker& signatureChecker,
 
     if (errorEncountered)
     {
-        meta.operations.clear();
+        meta.operations().clear();
         markResultFailed();
     }
 
@@ -660,7 +660,7 @@ TransactionFrame::applyOperations(SignatureChecker& signatureChecker,
 }
 
 bool
-TransactionFrame::apply(LedgerDelta& delta, TransactionMetaV1& meta,
+TransactionFrame::apply(LedgerDelta& delta, TransactionMeta& meta,
                         Application& app)
 {
     resetSigningAccount();
@@ -682,7 +682,6 @@ TransactionFrame::apply(LedgerDelta& delta, TransactionMetaV1& meta,
         auto signaturesValid =
             cv >= (ValidationType::kInvalidPostAuth) &&
             processSignatures(signatureChecker, app, txDelta);
-        meta.txChanges = txDelta.getChanges();
         txDelta.commit();
         valid = signaturesValid && (cv == ValidationType::kFullyValid);
     }
