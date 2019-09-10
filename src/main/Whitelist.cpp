@@ -2,7 +2,9 @@
 #include "ledger/DataFrame.h"
 #include "transactions/SignatureUtils.h"
 #include "transactions/TransactionFrame.h"
+#include "util/Logging.h"
 #include <stdint.h>
+#include <cmath>
 #include <unordered_map>
 
 namespace stellar
@@ -27,6 +29,15 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
             auto name = data.dataName;
             auto value = data.dataValue;
 
+            // If the value isn't 4 bytes long, skip the entry.
+            if (value.size() != 4)
+            {
+                CLOG(INFO, "Whitelist")
+                    << "bad value for: " << name;
+
+                continue;
+            }
+
             int32_t intVal =
                 (value[0] << 24) + (value[1] << 16) + (value[2] << 8) + value[3];
 
@@ -44,9 +55,20 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
                 continue;
             }
 
-            std::vector<string64> keys = whitelist[intVal];
-            keys.emplace_back(name);
-            whitelist[intVal] = keys;
+            try
+            {
+                // An exception is thrown if the key isn't convertible.  The entry is then skipped.
+                KeyUtils::fromStrKey<PublicKey>(name);
+
+                std::vector<string64> keys = whitelist[intVal];
+                keys.emplace_back(name);
+                whitelist[intVal] = keys;
+            }
+            catch (...)
+            {
+                CLOG(INFO, "Whitelist")
+                    << "bad public key: " << name;
+            }
         }
 }
 
@@ -55,7 +77,7 @@ void Whitelist::fulfill(std::vector<DataFrame::pointer> dfs)
 size_t
 Whitelist::unwhitelistedReserve(size_t setSize)
 {
-    size_t reserve = size_t(std::trunc(mReserve * setSize)); 
+    size_t reserve = size_t(trunc(mReserve * setSize)); 
 	
 	// reserve at least 1 entry for non-whitelisted txs
 	reserve = std::max((size_t)1, reserve);

@@ -15,9 +15,19 @@ class ManagedDataCache
   public:
     ManagedDataCache(Application& app) : mApp(app)
     {
-        lcl = 0;
+        needsUpdate = true;
     }
 
+    void setNeedsUpdate()
+    {
+        needsUpdate = true;
+    }
+
+    uint32_t getUpdateCounter()
+    {
+        return updateCounter;
+    }
+    
     std::shared_ptr<AccountID> accountID();
 
     void update();
@@ -28,6 +38,7 @@ class ManagedDataCache
     Application& mApp;
 
   private:
-    uint32_t lcl = 0;
+    bool needsUpdate;
+    uint32_t updateCounter = 0;
 };
 }

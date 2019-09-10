@@ -23,7 +23,7 @@ ManagedDataCache::update()
 {
     auto id = getAccount();
 
-    if (id.size() == 0 || lcl >= mApp.getLedgerManager().getLastClosedLedgerNum())
+    if (id.size() == 0 || needsUpdate == false)
         return;
 
     AccountID aid(KeyUtils::fromStrKey<PublicKey>(id));
@@ -31,6 +31,8 @@ ManagedDataCache::update()
 
     // Handle dataframe objects
     fulfill(dfs);
-    lcl = mApp.getLedgerManager().getLastClosedLedgerNum();
+    
+    needsUpdate = false;
+    updateCounter++;
 }
 }
